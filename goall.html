@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GOALL - 校园足球赛事管理系统</title>
+  <meta name="description" content="GOALL：面向校园足球爱好者的赛事管理APP，融合实时比分、战术分析、联赛排名等核心功能。">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['"Noto Sans SC"', 'Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            goall: { 50:'#f3e8ff',100:'#e9d5ff',200:'#d8b4fe',300:'#c084fc',400:'#a855f7',500:'#9333ea',600:'#7c2db5',700:'#6b21a8',800:'#581c87',900:'#1a0533' },
+            pitch: { 400:'#00ff87',500:'#00e676',600:'#00c853' },
+            dark: { 900:'#0a0a1a',800:'#0f0a1a',700:'#1a0a2e' },
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    html{scroll-behavior:smooth}
+    ::-webkit-scrollbar{width:8px}
+    ::-webkit-scrollbar-track{background:#0a0a1a}
+    ::-webkit-scrollbar-thumb{background:linear-gradient(to bottom,#a855f7,#ec4899);border-radius:4px}
+    body{background:#0a0a1a;color:#e2e8f0;overflow-x:hidden}
+
+    /* 导航栏 */
+    #navbar{background:transparent;transition:all .4s ease}
+    #navbar.scrolled{background:rgba(10,10,26,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05)}
+
+    /* 渐变文字 */
+    .gradient-text{background:linear-gradient(135deg,#a855f7 0%,#ec4899 50%,#00ff87 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gradient-shift 4s ease infinite}
+    @keyframes gradient-shift{0%,100%{background-position:0% center}50%{background-position:100% center}}
+
+    /* 入场动画 */
+    .fade-in-up{opacity:0;transform:translateY(30px);transition:opacity .6s ease,transform .6s ease}
+    .fade-in-up.visible{opacity:1;transform:translateY(0)}
+    .fade-in-left{opacity:0;transform:translateX(-40px);transition:opacity .6s ease,transform .6s ease}
+    .fade-in-left.visible{opacity:1;transform:translateX(0)}
+    .fade-in-right{opacity:0;transform:translateX(40px);transition:opacity .6s ease,transform .6s ease}
+    .fade-in-right.visible{opacity:1;transform:translateX(0)}
+
+    /* 汉堡菜单 */
+    .menu-toggle span{display:block;width:24px;height:2px;background:#e2e8f0;border-radius:2px;transition:all .3s ease;transform-origin:center}
+    .menu-toggle.active span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
+    .menu-toggle.active span:nth-child(2){opacity:0}
+    .menu-toggle.active span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
+
+    /* 返回按钮 */
+    .back-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:rgba(255,255,255,.06);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:#94a3b8;font-weight:500;font-size:14px;transition:all .3s ease;text-decoration:none}
+    .back-btn:hover{background:rgba(255,255,255,.1);color:#00ff87;border-color:rgba(0,255,135,.3)}
+
+    /* 导航链接 */
+    .nav-link{position:relative;color:#94a3b8;font-weight:500;transition:color .3s ease}
+    .nav-link:hover{color:#00ff87}
+    .nav-link::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;background:linear-gradient(90deg,#a855f7,#00ff87);transition:width .3s ease}
+    .nav-link:hover::after{width:100%}
+
+    /* 英雄区 */
+    .hero-cinematic{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .hero-cinematic::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,26,.3) 0%,rgba(10,10,26,.6) 40%,rgba(10,10,26,.95) 100%);z-index:1}
+    .hero-bg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.7) saturate(1.2)}
+    .hero-content{position:relative;z-index:2;text-align:center;padding:0 24px}
+
+    /* 分割线 */
+    .section-divider{width:60px;height:3px;background:linear-gradient(90deg,#a855f7,#00ff87);border-radius:2px;margin:0 auto}
+
+    /* Tab 按钮 */
+    .tab-btn{padding:10px 24px;border-radius:9999px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#94a3b8;font-weight:500;font-size:14px;cursor:pointer;transition:all .3s ease}
+    .tab-btn:hover{border-color:rgba(168,85,247,.3);color:#e2e8f0}
+    .tab-btn.active{background:linear-gradient(135deg,#a855f7,#7c2db5);border-color:transparent;color:#fff;box-shadow:0 4px 16px rgba(168,85,247,.3)}
+
+    /* Tab 内容 */
+    .tab-content{display:none}
+    .tab-content.active{display:block}
+
+    /* 组件图片展示 */
+    .comp-img-card{border-radius:16px;overflow:hidden;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);transition:all .3s ease;cursor:pointer}
+    .comp-img-card:hover{border-color:rgba(168,85,247,.25);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+    .comp-img-card img{width:100%;display:block;object-fit:contain}
+
+    /* 主截图展示 - 不完整显示效果 */
+    .main-screenshot{position:relative;border-radius:20px;overflow:hidden;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)}
+    .main-screenshot img{width:100%;display:block;object-fit:cover;object-position:top center}
+
+    /* 组件缩略图条 */
+    .comp-thumb-strip{display:flex;gap:8px;overflow-x:auto;padding:4px 0;scrollbar-width:none}
+    .comp-thumb-strip::-webkit-scrollbar{display:none}
+    .comp-thumb-item{flex-shrink:0;width:64px;height:64px;border-radius:10px;overflow:hidden;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);cursor:pointer;transition:all .25s ease}
+    .comp-thumb-item:hover{border-color:rgba(168,85,247,.4);transform:scale(1.08)}
+    .comp-thumb-item img{width:100%;height:100%;object-fit:contain}
+
+    /* 横向滚动条 */
+    .scroll-strip{display:flex;gap:16px;overflow-x:auto;padding:20px 0;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+    .scroll-strip::-webkit-scrollbar{display:none}
+    .scroll-strip>*{scroll-snap-align:start;flex-shrink:0}
+
+    /* 球员卡片网格 */
+    .player-masonry{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    @media(max-width:640px){.player-masonry{grid-template-columns:repeat(2,1fr)}}
+
+    /* 模态框 */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .3s ease}
+    .modal-overlay.active{opacity:1;pointer-events:auto}
+    .modal-content{background:#1a0a2e;border-radius:24px;max-width:900px;width:100%;max-height:90vh;overflow-y:auto;transform:scale(.9) translateY(20px);transition:transform .3s ease;box-shadow:0 40px 80px rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.08)}
+    .modal-overlay.active .modal-content{transform:scale(1) translateY(0)}
+    .modal-close{position:absolute;top:16px;right:16px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.1);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;transition:all .2s ease}
+    .modal-close:hover{background:rgba(255,255,255,.2);transform:scale(1.1)}
+    .modal-img-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+    .modal-img-item{border-radius:16px;overflow:hidden;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)}
+    .modal-img-item img{width:100%;display:block;object-fit:contain}
+
+    /* 脉冲 */
+    .animate-pulse-slow{animation:pulse-slow 4s ease-in-out infinite}
+    @keyframes pulse-slow{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:.5;transform:scale(1.1)}}
+
+    /* 高亮卡片 */
+    .highlight-card{padding:16px 20px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);transition:all .3s ease}
+    .highlight-card:hover{background:rgba(255,255,255,.05);border-color:rgba(168,85,247,.15)}
+
+    /* 响应式 */
+    @media(max-width:768px){
+      .hero-bg-img{object-position:center top}
+      .hero-content p.whitespace-nowrap{white-space:normal;font-size:13px}
+      .comp-thumb-item{width:52px;height:52px}
+    }
+  </style>
+</head>
+
+<body class="font-sans">
+
+  <!-- ==================== 导航栏 ==================== -->
+  <nav id="navbar" class="fixed top-0 left-0 right-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 md:h-20">
+        <a href="index.html" class="flex items-center gap-3 group">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-goall-400 to-pitch-400 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-goall-400/30">
+            <i data-lucide="trophy" class="w-5 h-5"></i>
+          </div>
+          <span class="hidden sm:block text-sm md:text-base font-bold tracking-wide text-white">GO<span class="text-pitch-400">ALL</span></span>
+        </a>
+        <div class="hidden md:flex items-center gap-8">
+          <a href="#overview" class="nav-link text-sm">项目概述</a>
+          <a href="#hub" class="nav-link text-sm">信息中枢</a>
+          <a href="#match-schedule" class="nav-link text-sm">比赛与赛程</a>
+          <a href="#team" class="nav-link text-sm">主队</a>
+          <a href="#profile" class="nav-link text-sm">个人中心</a>
+          <a href="#results" class="nav-link text-sm">项目成果</a>
+        </div>
+        <a href="index.html" class="back-btn">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          <span class="hidden sm:inline">返回作品集</span>
+        </a>
+        <button id="menuToggle" class="md:hidden menu-toggle flex flex-col gap-1.5 p-2" aria-label="打开菜单">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+    <div id="mobileMenu" class="md:hidden hidden">
+      <div class="mx-4 mt-2 bg-dark-700 rounded-2xl p-6 flex flex-col gap-4 shadow-xl border border-white/5">
+        <a href="#overview" class="mobile-nav-link text-base font-medium text-gray-400 hover:text-pitch-400 transition-colors py-2">项目概述</a>
+        <a href="#hub" class="mobile-nav-link text-base font-medium text-gray-400 hover:text-pitch-400 transition-colors py-2">信息中枢</a>
+        <a href="#match-schedule" class="mobile-nav-link text-base font-medium text-gray-400 hover:text-pitch-400 transition-colors py-2">比赛与赛程</a>
+        <a href="#team" class="mobile-nav-link text-base font-medium text-gray-400 hover:text-pitch-400 transition-colors py-2">主队</a>
+        <a href="#profile" class="mobile-nav-link text-base font-medium text-gray-400 hover:text-pitch-400 transition-colors py-2">个人中心</a>
+        <a href="#results" class="mobile-nav-link text-base font-medium text-gray-400 hover:text-pitch-400 transition-colors py-2">项目成果</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ==================== 英雄区：全屏插画 ==================== -->
+  <section class="hero-cinematic">
+    <img src="assets/goall/components/FIFA插画.png" alt="GOALL" class="hero-bg-img">
+    <div class="hero-content fade-in-up">
+      <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/15 rounded-full mb-8 backdrop-blur-sm">
+        <span class="w-2 h-2 bg-pitch-400 rounded-full animate-pulse"></span>
+        <span class="text-sm font-medium text-white/90">校园足球赛事管理平台</span>
+      </div>
+      <h1 class="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black mb-4 leading-none tracking-tight">
+        <span class="gradient-text">GOALL</span>
+      </h1>
+      <p class="text-lg sm:text-xl text-white/70 mb-6 max-w-xl mx-auto">
+        面向校园足球爱好者的智能赛事管理 APP
+      </p>
+      <p class="text-sm text-white/50 mb-10 leading-relaxed whitespace-nowrap">
+        融合实时比分追踪、深度战术分析、联赛排名查询、比赛日程管理的一站式足球平台
+      </p>
+      <div class="flex flex-wrap gap-4 justify-center">
+        <a href="#overview" class="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-goall-500 to-goall-600 text-white font-semibold rounded-2xl shadow-lg shadow-goall-500/30 hover:shadow-goall-500/50 hover:scale-105 transition-all duration-300">
+          探索设计详情
+          <i data-lucide="arrow-down" class="w-5 h-5"></i>
+        </a>
+      </div>
+    </div>
+    <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-dark-900 to-transparent z-10"></div>
+  </section>
+
+  <!-- ==================== 项目概述 ==================== -->
+  <section id="overview" class="relative py-20 md:py-28">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16 fade-in-up">
+        <h2 class="text-3xl md:text-4xl font-black text-white mb-4">项目概述</h2>
+        <div class="section-divider mb-6"></div>
+      </div>
+
+      <!-- 封面展示 - 不完整显示效果 -->
+      <div class="relative rounded-3xl overflow-hidden mb-12 fade-in-up" style="background:linear-gradient(135deg,#1a0533 0%,#2d1066 50%,#1a0533 100%);border:1px solid rgba(255,255,255,.06)">
+        <div class="flex flex-col lg:flex-row">
+          <!-- 左：封面图 - 不完整显示（裁剪效果） -->
+          <div class="lg:w-3/5 relative" style="min-height:360px">
+            <div class="absolute inset-0 overflow-hidden">
+              <img src="assets/goall/封面.png" alt="GOALL 封面" class="w-full h-full object-cover object-center" style="filter:brightness(.85) saturate(1.1)">
+            </div>
+            <!-- 渐变遮罩 - 右侧过渡 -->
+            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-goall-900/90 hidden lg:block"></div>
+            <!-- 渐变遮罩 - 底部过渡 -->
+            <div class="absolute inset-0 bg-gradient-to-t from-goall-900/80 via-transparent to-transparent lg:hidden"></div>
+            <!-- 裁剪指示线 -->
+            <div class="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-goall-400/40 via-pitch-400/30 to-goall-400/40 hidden lg:block"></div>
+          </div>
+          <!-- 右：介绍文字 -->
+          <div class="lg:w-2/5 p-8 md:p-12 flex flex-col justify-center relative z-10">
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-pitch-400/10 border border-pitch-400/20 rounded-full mb-6 w-fit">
+              <span class="text-xs font-medium text-pitch-400">UI/UX 设计</span>
+            </div>
+            <h3 class="text-2xl md:text-3xl font-bold text-white mb-4">校园足球赛事管理系统</h3>
+            <p class="text-gray-400 leading-relaxed mb-6">
+              GOALL 以<strong class="text-goall-300">深紫色渐变</strong>为主色调，搭配<strong class="text-pitch-400">亮绿色强调</strong>，营造充满激情与生命力的视觉氛围。
+            </p>
+            <p class="text-gray-400 leading-relaxed mb-8">
+              设计语言采用"锐角 + 圆角"混搭风格，数据卡片分区清晰，边框利落。半透明紫色背景卡片配合微弱边框，在深色背景上营造出层次感与科技感。
+            </p>
+            <div class="grid grid-cols-3 gap-4">
+              <div class="text-center p-3 rounded-xl bg-white/5 border border-white/5">
+                <div class="text-xl font-black text-pitch-400">6+</div>
+                <div class="text-xs text-gray-500 mt-1">核心模块</div>
+              </div>
+              <div class="text-center p-3 rounded-xl bg-white/5 border border-white/5">
+                <div class="text-xl font-black text-goall-400">19</div>
+                <div class="text-xs text-gray-500 mt-1">UI 组件</div>
+              </div>
+              <div class="text-center p-3 rounded-xl bg-white/5 border border-white/5">
+                <div class="text-xl font-black text-pitch-400">5</div>
+                <div class="text-xs text-gray-500 mt-1">联赛覆盖</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 设计规范色板 -->
+      <div class="fade-in-up">
+        <h3 class="text-xl font-bold text-white text-center mb-8">设计规范</h3>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div class="group p-5 rounded-2xl bg-white/3 border border-white/5 text-center hover:border-goall-400/30 transition-all">
+            <div class="w-16 h-16 rounded-2xl mx-auto mb-3 bg-gradient-to-br from-goall-700 via-goall-800 to-goall-900 border border-goall-400/20 group-hover:scale-110 transition-transform"></div>
+            <div class="text-sm font-semibold text-white">深紫渐变</div>
+            <div class="text-xs text-gray-500 mt-1">主色调</div>
+          </div>
+          <div class="group p-5 rounded-2xl bg-white/3 border border-white/5 text-center hover:border-pitch-400/30 transition-all">
+            <div class="w-16 h-16 rounded-2xl mx-auto mb-3 bg-gradient-to-br from-pitch-400 to-pitch-600 group-hover:scale-110 transition-transform"></div>
+            <div class="text-sm font-semibold text-white">亮绿 #00ff87</div>
+            <div class="text-xs text-gray-500 mt-1">强调色</div>
+          </div>
+          <div class="group p-5 rounded-2xl bg-white/3 border border-white/5 text-center hover:border-white/15 transition-all">
+            <div class="w-16 h-16 rounded-2xl mx-auto mb-3 bg-white/5 border border-white/10 group-hover:scale-110 transition-transform"></div>
+            <div class="text-sm font-semibold text-white">半透明卡片</div>
+            <div class="text-xs text-gray-500 mt-1">圆角 16px</div>
+          </div>
+          <div class="group p-5 rounded-2xl bg-white/3 border border-white/5 text-center hover:border-white/15 transition-all">
+            <div class="w-16 h-16 rounded-2xl mx-auto mb-3 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 border border-blue-400/20 group-hover:scale-110 transition-transform"></div>
+            <div class="text-sm font-semibold text-white">锐角+圆角</div>
+            <div class="text-xs text-gray-500 mt-1">设计语言</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 信息中枢：Tab 切换页面介绍 ==================== -->
+  <section id="hub" class="relative py-20 md:py-28" style="background:linear-gradient(180deg,#0a0a1a 0%,#120826 50%,#0a0a1a 100%)">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12 fade-in-up">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-goall-400/10 border border-goall-400/20 rounded-full mb-4">
+          <i data-lucide="layout-dashboard" class="w-3.5 h-3.5 text-goall-400"></i>
+          <span class="text-xs font-medium text-goall-300">首页设计</span>
+        </div>
+        <h3 class="text-2xl md:text-3xl font-bold text-white mb-3">信息中枢</h3>
+        <p class="text-gray-400 max-w-2xl mx-auto">首页整合新闻、比赛、排名三大板块，通过 Tab 切换实现信息分流</p>
+      </div>
+
+      <!-- Tab 按钮：首页1 / 首页2 / 首页3 -->
+      <div class="flex justify-center gap-3 mb-12 flex-wrap fade-in-up">
+        <button class="tab-btn active" data-tab="home1">首页1</button>
+        <button class="tab-btn" data-tab="home2">首页2</button>
+        <button class="tab-btn" data-tab="home3">首页3</button>
+      </div>
+
+      <!-- ==================== 首页1 Tab：新闻板块 ==================== -->
+      <div id="tab-home1" class="tab-content active">
+        <!-- 主截图：全宽展示 -->
+        <div class="fade-in-up mb-8">
+          <div class="main-screenshot mx-auto" style="max-width:380px">
+            <img src="assets/goall/首页-新闻.png" alt="首页新闻 Tab" class="w-full">
+          </div>
+        </div>
+        <!-- 组件 + 说明：左右布局 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+          <!-- 组件图片：完整展示 -->
+          <div class="fade-in-left">
+            <div class="text-xs text-gray-500 mb-3 font-medium">关联组件</div>
+            <div class="grid grid-cols-3 gap-3">
+              <div class="comp-img-card">
+                <img src="assets/goall/components/新闻卡片-转会1.png" alt="新闻卡片-转会1">
+                <div class="p-2 text-center"><span class="text-[10px] text-gray-500">新闻卡片1</span></div>
+              </div>
+              <div class="comp-img-card">
+                <img src="assets/goall/components/新闻卡片-转会2.png" alt="新闻卡片-转会2">
+                <div class="p-2 text-center"><span class="text-[10px] text-gray-500">新闻卡片2</span></div>
+              </div>
+              <div class="comp-img-card">
+                <img src="assets/goall/components/新闻列表1.png" alt="新闻列表">
+                <div class="p-2 text-center"><span class="text-[10px] text-gray-500">新闻列表</span></div>
+              </div>
+            </div>
+          </div>
+          <!-- 功能说明 -->
+          <div class="fade-in-right">
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-goall-400/10 border border-goall-400/20 rounded-full mb-4">
+              <i data-lucide="newspaper" class="w-4 h-4 text-goall-400"></i>
+              <span class="text-sm font-medium text-goall-300">新闻板块</span>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-3">头条新闻</h3>
+            <p class="text-gray-400 leading-relaxed mb-5 text-sm">
+              首页新闻板块以卡片流形式展示赛事资讯，支持横向滑动浏览。每条新闻包含图片、标题、来源和时间。
+            </p>
+            <div class="space-y-3">
+              <div class="highlight-card">
+                <div class="flex items-center gap-3 mb-2">
+                  <div class="w-9 h-9 rounded-xl bg-goall-400/10 flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="image" class="w-4 h-4 text-goall-400"></i>
+                  </div>
+                  <h4 class="font-bold text-white text-sm">新闻卡片</h4>
+                </div>
+                <p class="text-xs text-gray-400 leading-relaxed">转会资讯卡片，图文混排展示，包含球员照片、标题摘要和"点击查看"按钮。</p>
+              </div>
+              <div class="highlight-card">
+                <div class="flex items-center gap-3 mb-2">
+                  <div class="w-9 h-9 rounded-xl bg-pitch-400/10 flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="list" class="w-4 h-4 text-pitch-400"></i>
+                  </div>
+                  <h4 class="font-bold text-white text-sm">新闻列表</h4>
+                </div>
+                <p class="text-xs text-gray-400 leading-relaxed">多条赛事资讯列表，缩略图 + 标题 + 时间，支持滚动浏览更多内容。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== 首页2 Tab：比赛板块 ==================== -->
+      <div id="tab-home2" class="tab-content">
+        <!-- 主截图：全宽展示 -->
+        <div class="fade-in-up mb-8">
+          <div class="main-screenshot mx-auto" style="max-width:380px">
+            <img src="assets/goall/首页-比赛.png" alt="首页比赛 Tab" class="w-full">
+          </div>
+        </div>
+        <!-- 组件 + 说明：左右布局 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+          <!-- 组件图片：完整展示 -->
+          <div class="fade-in-left">
+            <div class="text-xs text-gray-500 mb-3 font-medium">关联组件</div>
+            <div class="grid grid-cols-3 gap-3">
+              <div class="comp-img-card">
+                <img src="assets/goall/components/比分卡片-进行中.png" alt="比分卡片-进行中">
+                <div class="p-2 text-center"><span class="text-[10px] text-pitch-400">● 进行中</span></div>
+              </div>
+              <div class="comp-img-card">
+                <img src="assets/goall/components/比分卡片-已结束.png" alt="比分卡片-已结束">
+                <div class="p-2 text-center"><span class="text-[10px] text-gray-500">已结束</span></div>
+              </div>
+              <div class="comp-img-card">
+                <img src="assets/goall/components/比分卡片-未开始.png" alt="比分卡片-未开始">
+                <div class="p-2 text-center"><span class="text-[10px] text-gray-500">未开始</span></div>
+              </div>
+            </div>
+          </div>
+          <!-- 功能说明 -->
+          <div class="fade-in-right">
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-pitch-400/10 border border-pitch-400/20 rounded-full mb-4">
+              <i data-lucide="football" class="w-4 h-4 text-pitch-400"></i>
+              <span class="text-sm font-medium text-pitch-400">比赛板块</span>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-3">实时比分</h3>
+            <p class="text-gray-400 leading-relaxed mb-5 text-sm">
+              比赛板块展示实时比分卡片，支持左右滑动查看多场比赛。每张卡片包含队徽、队名、比分和比赛状态。
+            </p>
+            <div class="space-y-3">
+              <div class="highlight-card">
+                <div class="flex items-center gap-3 mb-2">
+                  <div class="w-9 h-9 rounded-xl bg-pitch-400/10 flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="play" class="w-4 h-4 text-pitch-400"></i>
+                  </div>
+                  <h4 class="font-bold text-white text-sm">进行中</h4>
+                </div>
+                <p class="text-xs text-gray-400 leading-relaxed">实时比分更新，显示当前比赛时间（如 80'），绿色状态标签标识进行中。</p>
+              </div>
+              <div class="highlight-card">
+                <div class="flex items-center gap-3 mb-2">
+                  <div class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="square" class="w-4 h-4 text-gray-400"></i>
+                  </div>
+                  <h4 class="font-bold text-white text-sm">已结束 / 未开始</h4>
+                </div>
+                <p class="text-xs text-gray-400 leading-relaxed">已结束比赛显示最终比分，未开始比赛显示开赛时间和联赛信息。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== 首页3 Tab：排名板块 ==================== -->
+      <div id="tab-home3" class="tab-content">
+        <!-- 主截图：全宽展示 -->
+        <div class="fade-in-up mb-8">
+          <div class="main-screenshot mx-auto" style="max-width:380px">
+            <img src="assets/goall/首页-排名.png" alt="首页排名 Tab" class="w-full">
+          </div>
+        </div>
+        <!-- 说明 -->
+        <div class="max-w-2xl mx-auto fade-in-up">
+          <div class="inline-flex items-center gap-2 px-4 py-2 bg-goall-400/10 border border-goall-400/20 rounded-full mb-4">
+            <i data-lucide="bar-chart-3" class="w-4 h-4 text-goall-400"></i>
+            <span class="text-sm font-medium text-goall-300">排名板块</span>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-3">联赛排名</h3>
+          <p class="text-gray-400 leading-relaxed mb-5 text-sm">
+            排名板块展示联赛积分榜，包含排名、球队、场次、胜平负、净胜球、积分等完整数据，支持联赛筛选。
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="highlight-card">
+              <div class="flex items-center gap-3 mb-2">
+                <div class="w-9 h-9 rounded-xl bg-goall-400/10 flex items-center justify-center flex-shrink-0">
+                  <i data-lucide="trophy" class="w-4 h-4 text-goall-400"></i>
+                </div>
+                <h4 class="font-bold text-white text-sm">积分榜</h4>
+              </div>
+              <p class="text-xs text-gray-400 leading-relaxed">完整的联赛积分数据展示，支持按联赛筛选，排名实时更新。</p>
+            </div>
+            <div class="highlight-card">
+              <div class="flex items-center gap-3 mb-2">
+                <div class="w-9 h-9 rounded-xl bg-pitch-400/10 flex items-center justify-center flex-shrink-0">
+                  <i data-lucide="filter" class="w-4 h-4 text-pitch-400"></i>
+                </div>
+                <h4 class="font-bold text-white text-sm">联赛筛选</h4>
+              </div>
+              <p class="text-xs text-gray-400 leading-relaxed">支持英超、西甲、德甲、意甲、法甲五大联赛筛选切换。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 比赛详情 + 赛程：合并板块 ==================== -->
+  <section id="match-schedule" class="relative py-20 md:py-28">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16 fade-in-up">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-pitch-400/10 border border-pitch-400/20 rounded-full mb-4">
+          <i data-lucide="tv" class="w-3.5 h-3.5 text-pitch-400"></i>
+          <span class="text-xs font-medium text-pitch-400">比赛 + 赛程</span>
+        </div>
+        <h3 class="text-2xl md:text-3xl font-bold text-white mb-3">比赛详情与赛程设计</h3>
+        <p class="text-gray-400 max-w-2xl mx-auto">沉浸式比赛体验与智能赛程管理，从实时直播到联赛筛选全覆盖</p>
+      </div>
+
+      <!-- 上半部分：比赛详情（球迷室） -->
+      <div class="mb-20">
+        <div class="flex items-center gap-3 mb-8 fade-in-up">
+          <div class="w-10 h-10 rounded-xl bg-pitch-400/10 flex items-center justify-center">
+            <i data-lucide="radio" class="w-5 h-5 text-pitch-400"></i>
+          </div>
+          <div>
+            <h4 class="text-lg font-bold text-white">比赛详情 · 球迷室</h4>
+            <p class="text-xs text-gray-500">进攻心率图 + 技术统计 + 实时留言</p>
+          </div>
+        </div>
+
+        <!-- 比赛详情：2x2 组件网格 -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div class="comp-img-card fade-in-up" onclick="openModal('match-detail1')">
+            <img src="assets/goall/components/比赛详情-直播中.png" alt="实时直播">
+            <div class="p-3">
+              <div class="flex items-center gap-1.5 mb-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-pitch-400 animate-pulse"></span>
+                <span class="text-xs font-medium text-white">实时直播</span>
+              </div>
+              <p class="text-[10px] text-gray-500">队徽+比分+进度条</p>
+            </div>
+          </div>
+          <div class="comp-img-card fade-in-up" style="animation-delay:.05s" onclick="openModal('match-detail2')">
+            <img src="assets/goall/components/比赛详情-直播中2.png" alt="技术统计">
+            <div class="p-3">
+              <div class="text-xs font-medium text-white mb-1">技术统计</div>
+              <p class="text-[10px] text-gray-500">控球率·射门·射正</p>
+            </div>
+          </div>
+          <div class="comp-img-card fade-in-up" style="animation-delay:.1s" onclick="openModal('match-detail3')">
+            <img src="assets/goall/components/比赛详情-直播中3.png" alt="进攻心率图">
+            <div class="p-3">
+              <div class="text-xs font-medium text-white mb-1">进攻心率图</div>
+              <p class="text-[10px] text-gray-500">时间轴可视化节奏</p>
+            </div>
+          </div>
+          <div class="comp-img-card fade-in-up" style="animation-delay:.15s" onclick="openModal('match-pending')">
+            <img src="assets/goall/components/比赛详情-未开始.png" alt="赛前预告">
+            <div class="p-3">
+              <div class="text-xs font-medium text-white mb-1">赛前预告</div>
+              <p class="text-[10px] text-gray-500">未开始状态展示</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 功能标签 -->
+        <div class="flex flex-wrap justify-center gap-3 fade-in-up">
+          <div class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/3 border border-white/5">
+            <i data-lucide="activity" class="w-3.5 h-3.5 text-pitch-400"></i>
+            <span class="text-xs text-gray-300">进攻心率图</span>
+          </div>
+          <div class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/3 border border-white/5">
+            <i data-lucide="bar-chart" class="w-3.5 h-3.5 text-goall-400"></i>
+            <span class="text-xs text-gray-300">技术统计</span>
+          </div>
+          <div class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/3 border border-white/5">
+            <i data-lucide="message-circle" class="w-3.5 h-3.5 text-pitch-400"></i>
+            <span class="text-xs text-gray-300">实时留言板</span>
+          </div>
+          <div class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/3 border border-white/5">
+            <i data-lucide="layout-grid" class="w-3.5 h-3.5 text-goall-400"></i>
+            <span class="text-xs text-gray-300">赛况/评分/阵容</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 分割 -->
+      <div class="section-divider my-12"></div>
+
+      <!-- 下半部分：赛程设计 -->
+      <div>
+        <div class="flex items-center gap-3 mb-8 fade-in-up">
+          <div class="w-10 h-10 rounded-xl bg-goall-400/10 flex items-center justify-center">
+            <i data-lucide="calendar" class="w-5 h-5 text-goall-400"></i>
+          </div>
+          <div>
+            <h4 class="text-lg font-bold text-white">赛程管理</h4>
+            <p class="text-xs text-gray-500">联赛筛选 + 比赛卡片，统一呈现</p>
+          </div>
+        </div>
+
+        <!-- 赛程截图并排展示 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div class="fade-in-up">
+            <div class="main-screenshot" style="max-width:340px;margin:0 auto">
+              <img src="assets/goall/赛程.png" alt="赛程筛选">
+            </div>
+            <div class="mt-4 text-center">
+              <h5 class="text-sm font-bold text-white mb-2">联赛筛选 Tab</h5>
+              <p class="text-gray-400 text-xs leading-relaxed mb-3">
+                支持按联赛快速筛选：英超、西甲、德甲、意甲、法甲、全部。
+              </p>
+              <div class="flex flex-wrap justify-center gap-2">
+                <span class="px-3 py-1 rounded-full text-xs bg-goall-400/10 text-goall-300 border border-goall-400/15">英超</span>
+                <span class="px-3 py-1 rounded-full text-xs bg-white/5 text-gray-400 border border-white/8">西甲</span>
+                <span class="px-3 py-1 rounded-full text-xs bg-white/5 text-gray-400 border border-white/8">德甲</span>
+                <span class="px-3 py-1 rounded-full text-xs bg-white/5 text-gray-400 border border-white/8">意甲</span>
+                <span class="px-3 py-1 rounded-full text-xs bg-white/5 text-gray-400 border border-white/8">法甲</span>
+              </div>
+            </div>
+          </div>
+          <div class="fade-in-up" style="animation-delay:.1s">
+            <div class="main-screenshot" style="max-width:340px;margin:0 auto">
+              <img src="assets/goall/赛程2.png" alt="赛程卡片">
+            </div>
+            <div class="mt-4 text-center">
+              <h5 class="text-sm font-bold text-white mb-2">比赛卡片</h5>
+              <p class="text-gray-400 text-xs leading-relaxed mb-3">
+                每场比赛以卡片形式展示，包含队徽、队名、比分和比赛状态。按日期分组。
+              </p>
+              <div class="flex flex-wrap justify-center gap-2">
+                <span class="px-3 py-1 rounded-full text-xs bg-pitch-400/10 text-pitch-400 border border-pitch-400/15">进行中</span>
+                <span class="px-3 py-1 rounded-full text-xs bg-white/5 text-gray-400 border border-white/8">未开始</span>
+                <span class="px-3 py-1 rounded-full text-xs bg-white/5 text-gray-500 border border-white/8">已结束</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 主队设计：优化排版 ==================== -->
+  <section id="team" class="relative py-20 md:py-28" style="background:linear-gradient(180deg,#0a0a1a 0%,#120826 50%,#0a0a1a 100%)">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12 fade-in-up">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-pitch-400/10 border border-pitch-400/20 rounded-full mb-4">
+          <i data-lucide="users" class="w-3.5 h-3.5 text-pitch-400"></i>
+          <span class="text-xs font-medium text-pitch-400">球队专区</span>
+        </div>
+        <h3 class="text-2xl md:text-3xl font-bold text-white mb-3">主队设计</h3>
+        <p class="text-gray-400 max-w-2xl mx-auto">球迷专属阵地，球员卡片 + 球队阵容 + 新闻追踪</p>
+      </div>
+
+      <!-- 上方：左=新闻列表组件(大) + 右=球员卡片系统(标题+文字+组件条) -->
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start mb-12">
+        <!-- 左：新闻列表组件（大手机模型） -->
+        <div class="lg:col-span-2 fade-in-left">
+          <div class="text-xs text-gray-500 mb-3 font-medium">新闻列表组件</div>
+          <div class="comp-img-card" style="max-width:300px">
+            <img src="assets/goall/components/新闻列表2.png" alt="新闻列表组件">
+          </div>
+        </div>
+        <!-- 右：球员卡片系统 -->
+        <div class="lg:col-span-3 fade-in-right">
+          <h4 class="text-xl font-bold text-white mb-3">球员卡片系统</h4>
+          <!-- 文字内容 -->
+          <div class="mb-6">
+            <p class="text-gray-400 leading-relaxed mb-4 text-sm">
+              球员卡片采用橙红渐变背景，展示号码、照片、姓名，翻转可查看详细信息（年龄、国籍、司职、出生时间、加入时间）。
+            </p>
+            <div class="space-y-2.5">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-pitch-400/10 flex items-center justify-center flex-shrink-0">
+                  <i data-lucide="user" class="w-4 h-4 text-pitch-400"></i>
+                </div>
+                <span class="text-sm text-gray-300">球员卡片：号码 + 照片 + 姓名</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-goall-400/10 flex items-center justify-center flex-shrink-0">
+                  <i data-lucide="rotate-3d" class="w-4 h-4 text-goall-400"></i>
+                </div>
+                <span class="text-sm text-gray-300">翻转查看：年龄、国籍、司职</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-pitch-400/10 flex items-center justify-center flex-shrink-0">
+                  <i data-lucide="layers" class="w-4 h-4 text-pitch-400"></i>
+                </div>
+                <span class="text-sm text-gray-300">位置分类：后卫 / 中场 / 前锋</span>
+              </div>
+            </div>
+          </div>
+          <!-- 球员卡片组件条 -->
+          <div class="text-xs text-gray-500 mb-2 font-medium">球员卡片组件</div>
+          <div class="flex gap-2 overflow-x-auto pb-2">
+            <div class="comp-img-card flex-shrink-0" style="width:100px">
+              <img src="assets/goall/components/球员照片卡-03.png" alt="球员照片卡">
+              <div class="p-1 text-center"><span class="text-[9px] text-gray-500">03</span></div>
+            </div>
+            <div class="comp-img-card flex-shrink-0" style="width:100px">
+              <img src="assets/goall/components/球员照片卡-04.png" alt="球员照片卡">
+              <div class="p-1 text-center"><span class="text-[9px] text-gray-500">04</span></div>
+            </div>
+            <div class="comp-img-card flex-shrink-0" style="width:100px">
+              <img src="assets/goall/components/球员照片卡-05.png" alt="球员照片卡">
+              <div class="p-1 text-center"><span class="text-[9px] text-gray-500">05</span></div>
+            </div>
+            <div class="comp-img-card flex-shrink-0" style="width:100px">
+              <img src="assets/goall/components/球员信息卡.png" alt="球员信息卡">
+              <div class="p-1 text-center"><span class="text-[9px] text-gray-500">信息卡</span></div>
+            </div>
+            <div class="comp-img-card flex-shrink-0" style="width:100px">
+              <img src="assets/goall/components/球员信息卡2.png" alt="球员信息卡">
+              <div class="p-1 text-center"><span class="text-[9px] text-gray-500">信息卡</span></div>
+            </div>
+            <div class="comp-img-card flex-shrink-0" style="width:100px">
+              <img src="assets/goall/components/球员信息卡3.png" alt="球员信息卡">
+              <div class="p-1 text-center"><span class="text-[9px] text-gray-500">信息卡</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 下方：左=球员页(手机模型) + 右=主队页(手机模型) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+        <!-- 球员页 -->
+        <div class="fade-in-left">
+          <div class="text-xs text-gray-500 mb-3 font-medium text-center">球员页</div>
+          <div class="main-screenshot mx-auto" style="max-width:280px">
+            <img src="assets/goall/主队-阵容.png" alt="球员页" class="w-full">
+          </div>
+        </div>
+        <!-- 主队页 -->
+        <div class="fade-in-right">
+          <div class="text-xs text-gray-500 mb-3 font-medium text-center">主队页</div>
+          <div class="main-screenshot mx-auto" style="max-width:280px">
+            <img src="assets/goall/主队-新闻.png" alt="主队页" class="w-full">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 个人中心设计 ==================== -->
+  <section id="profile" class="relative py-20 md:py-28">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
+        <div class="lg:w-1/2 fade-in-left">
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-goall-400/10 border border-goall-400/20 rounded-full mb-4">
+            <i data-lucide="user" class="w-3.5 h-3.5 text-goall-400"></i>
+            <span class="text-xs font-medium text-goall-300">用户中心</span>
+          </div>
+          <h3 class="text-2xl md:text-3xl font-bold text-white mb-4">个人中心设计</h3>
+          <p class="text-gray-400 leading-relaxed mb-6">
+            个人中心整合用户信息、数据统计、功能专区和常用工具。VIP 标识彰显身份，成就徽章记录成长轨迹。
+          </p>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="flex items-center gap-2 p-3 rounded-xl bg-white/3 border border-white/5">
+              <i data-lucide="ticket" class="w-4 h-4 text-pitch-400"></i>
+              <span class="text-xs text-gray-300">我的票务</span>
+            </div>
+            <div class="flex items-center gap-2 p-3 rounded-xl bg-white/3 border border-white/5">
+              <i data-lucide="calendar" class="w-4 h-4 text-goall-400"></i>
+              <span class="text-xs text-gray-300">赛事日历</span>
+            </div>
+            <div class="flex items-center gap-2 p-3 rounded-xl bg-white/3 border border-white/5">
+              <i data-lucide="shopping-bag" class="w-4 h-4 text-pitch-400"></i>
+              <span class="text-xs text-gray-300">购票中心</span>
+            </div>
+            <div class="flex items-center gap-2 p-3 rounded-xl bg-white/3 border border-white/5">
+              <i data-lucide="palette" class="w-4 h-4 text-goall-400"></i>
+              <span class="text-xs text-gray-300">个性主题</span>
+            </div>
+            <div class="flex items-center gap-2 p-3 rounded-xl bg-white/3 border border-white/5">
+              <i data-lucide="trophy" class="w-4 h-4 text-yellow-400"></i>
+              <span class="text-xs text-gray-300">成就徽章</span>
+            </div>
+            <div class="flex items-center gap-2 p-3 rounded-xl bg-white/3 border border-white/5">
+              <i data-lucide="headphones" class="w-4 h-4 text-pink-400"></i>
+              <span class="text-xs text-gray-300">客服中心</span>
+            </div>
+          </div>
+        </div>
+        <div class="lg:w-1/2 fade-in-right">
+          <div class="relative mx-auto" style="width:280px">
+            <div class="rounded-[36px] p-3 bg-gradient-to-br from-goall-700 to-goall-900 shadow-2xl shadow-goall-500/20 border border-goall-400/20">
+              <div class="rounded-[26px] overflow-hidden">
+                <img src="assets/goall/个人中心.png" alt="个人中心" class="w-full">
+              </div>
+            </div>
+            <div class="absolute -top-8 -right-8 w-32 h-32 bg-goall-400/10 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-8 -left-8 w-32 h-32 bg-pitch-400/8 rounded-full blur-3xl"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 项目成果 ==================== -->
+  <section id="results" class="relative py-20 md:py-28" style="background:linear-gradient(180deg,#0a0a1a 0%,#120826 50%,#0a0a1a 100%)">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16 fade-in-up">
+        <h2 class="text-3xl md:text-4xl font-black text-white mb-4">项目成果</h2>
+        <div class="section-divider mb-6"></div>
+      </div>
+
+      <div class="space-y-6">
+        <div class="relative rounded-3xl overflow-hidden fade-in-up" style="background:linear-gradient(135deg,rgba(168,85,247,.12) 0%,rgba(0,255,135,.06) 100%);border:1px solid rgba(255,255,255,.06)">
+          <div class="flex flex-col sm:flex-row items-center gap-6 p-6 md:p-8">
+            <div class="w-16 h-16 rounded-2xl bg-goall-400/15 flex items-center justify-center flex-shrink-0">
+              <i data-lucide="zap" class="w-8 h-8 text-goall-400"></i>
+            </div>
+            <div class="text-center sm:text-left">
+              <h4 class="text-lg font-bold text-white mb-1">激情视觉体验</h4>
+              <p class="text-sm text-gray-400">深紫渐变 + 亮绿强调，营造热血沸腾的足球氛围，激发用户情感共鸣</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="relative rounded-3xl overflow-hidden fade-in-up" style="animation-delay:.1s;background:linear-gradient(135deg,rgba(0,255,135,.08) 0%,rgba(168,85,247,.08) 100%);border:1px solid rgba(255,255,255,.06)">
+          <div class="flex flex-col sm:flex-row items-center gap-6 p-6 md:p-8">
+            <div class="w-16 h-16 rounded-2xl bg-pitch-400/10 flex items-center justify-center flex-shrink-0">
+              <i data-lucide="bar-chart-3" class="w-8 h-8 text-pitch-400"></i>
+            </div>
+            <div class="text-center sm:text-left">
+              <h4 class="text-lg font-bold text-white mb-1">专业数据驱动</h4>
+              <p class="text-sm text-gray-400">进攻心率图、技术统计、球员评分，用数据讲述比赛故事，提升观赛深度</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="relative rounded-3xl overflow-hidden fade-in-up" style="animation-delay:.2s;background:linear-gradient(135deg,rgba(59,130,246,.08) 0%,rgba(168,85,247,.08) 100%);border:1px solid rgba(255,255,255,.06)">
+          <div class="flex flex-col sm:flex-row items-center gap-6 p-6 md:p-8">
+            <div class="w-16 h-16 rounded-2xl bg-blue-500/10 flex items-center justify-center flex-shrink-0">
+              <i data-lucide="layers" class="w-8 h-8 text-blue-400"></i>
+            </div>
+            <div class="text-center sm:text-left">
+              <h4 class="text-lg font-bold text-white mb-1">信息层级清晰</h4>
+              <p class="text-sm text-gray-400">半透明卡片 + 数据分区，复杂信息一目了然，锐角与圆角混搭设计语言</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="relative rounded-3xl overflow-hidden fade-in-up" style="animation-delay:.3s;background:linear-gradient(135deg,rgba(236,72,153,.08) 0%,rgba(168,85,247,.08) 100%);border:1px solid rgba(255,255,255,.06)">
+          <div class="flex flex-col sm:flex-row items-center gap-6 p-6 md:p-8">
+            <div class="w-16 h-16 rounded-2xl bg-pink-500/10 flex items-center justify-center flex-shrink-0">
+              <i data-lucide="smartphone" class="w-8 h-8 text-pink-400"></i>
+            </div>
+            <div class="text-center sm:text-left">
+              <h4 class="text-lg font-bold text-white mb-1">移动优先设计</h4>
+              <p class="text-sm text-gray-400">专为移动端设计，流畅的手势交互，随时随地追踪赛事动态</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 对比展示 -->
+      <div class="mt-16 rounded-3xl overflow-hidden border border-white/6 bg-white/3 p-8 md:p-12 fade-in-up">
+        <h3 class="text-xl font-bold text-white text-center mb-8">传统方式 vs GOALL</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div class="p-6 rounded-2xl border border-red-500/10" style="background:rgba(239,68,68,.04)">
+            <div class="flex items-center gap-2 mb-4">
+              <i data-lucide="x-circle" class="w-5 h-5 text-red-400"></i>
+              <span class="font-semibold text-red-400">传统方式</span>
+            </div>
+            <ul class="space-y-3 text-sm text-gray-400">
+              <li class="flex items-start gap-2"><span class="text-red-400 mt-0.5">-</span><span>多个 APP 切换查看不同联赛数据</span></li>
+              <li class="flex items-start gap-2"><span class="text-red-400 mt-0.5">-</span><span>比赛数据分散，缺乏可视化分析</span></li>
+              <li class="flex items-start gap-2"><span class="text-red-400 mt-0.5">-</span><span>赛程管理混乱，容易错过重要比赛</span></li>
+              <li class="flex items-start gap-2"><span class="text-red-400 mt-0.5">-</span><span>无主队追踪功能，球迷体验碎片化</span></li>
+            </ul>
+          </div>
+          <div class="p-6 rounded-2xl border border-pitch-400/10" style="background:rgba(0,255,135,.03)">
+            <div class="flex items-center gap-2 mb-4">
+              <i data-lucide="check-circle" class="w-5 h-5 text-pitch-400"></i>
+              <span class="font-semibold text-pitch-400">GOALL</span>
+            </div>
+            <ul class="space-y-3 text-sm text-gray-400">
+              <li class="flex items-start gap-2"><span class="text-pitch-400 mt-0.5">+</span><span>一站式覆盖五大联赛，统一管理</span></li>
+              <li class="flex items-start gap-2"><span class="text-pitch-400 mt-0.5">+</span><span>进攻心率图 + 技术统计，深度可视化</span></li>
+              <li class="flex items-start gap-2"><span class="text-pitch-400 mt-0.5">+</span><span>智能赛程管理，支持联赛筛选和状态追踪</span></li>
+              <li class="flex items-start gap-2"><span class="text-pitch-400 mt-0.5">+</span><span>专属主队页，新闻/阵容/数据一站式追踪</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 页脚 ==================== -->
+  <footer class="relative py-12 border-t border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-goall-400 to-pitch-400 flex items-center justify-center text-white">
+            <i data-lucide="trophy" class="w-5 h-5"></i>
+          </div>
+          <span class="font-bold text-white">GO<span class="text-pitch-400">ALL</span></span>
+        </div>
+        <div class="text-center md:text-right">
+          <p class="text-sm text-gray-500">UI/UX 设计作品集 · GOALL 项目介绍</p>
+          <p class="text-xs text-gray-600 mt-1">&copy; 2026 蔡文杰. All rights reserved.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== 模态框 ==================== -->
+  <div id="previewModal" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-content relative" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeModal()">
+        <i data-lucide="x" class="w-5 h-5 text-gray-300"></i>
+      </button>
+      <div class="p-8">
+        <h3 id="modalTitle" class="text-2xl font-bold text-white mb-2"></h3>
+        <p id="modalDesc" class="text-gray-400 mb-6"></p>
+        <div id="modalImages" class="modal-img-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      initNavbar();
+      initMobileMenu();
+      initScrollAnimations();
+      initTabs();
+    });
+
+    function initNavbar() {
+      const navbar = document.getElementById('navbar');
+      window.addEventListener('scroll', () => {
+        navbar.classList.toggle('scrolled', window.pageYOffset > 50);
+      }, { passive: true });
+    }
+
+    function initMobileMenu() {
+      const menuToggle = document.getElementById('menuToggle');
+      const mobileMenu = document.getElementById('mobileMenu');
+      let isOpen = false;
+      menuToggle.addEventListener('click', () => {
+        isOpen = !isOpen;
+        menuToggle.classList.toggle('active', isOpen);
+        if (isOpen) mobileMenu.classList.remove('hidden');
+        else mobileMenu.classList.add('hidden');
+      });
+      mobileMenu.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => { isOpen = false; menuToggle.classList.remove('active'); mobileMenu.classList.add('hidden'); });
+      });
+      document.addEventListener('click', (e) => {
+        if (isOpen && !menuToggle.contains(e.target) && !mobileMenu.contains(e.target)) {
+          isOpen = false; menuToggle.classList.remove('active'); mobileMenu.classList.add('hidden');
+        }
+      });
+    }
+
+    function initScrollAnimations() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const delay = entry.target.style.animationDelay || '0s';
+            setTimeout(() => entry.target.classList.add('visible'), parseFloat(delay) * 1000);
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { rootMargin: '0px 0px -50px 0px', threshold: 0.1 });
+      document.querySelectorAll('.fade-in-up, .fade-in-left, .fade-in-right').forEach(el => observer.observe(el));
+    }
+
+    function initTabs() {
+      const tabBtns = document.querySelectorAll('.tab-btn');
+      const tabContents = document.querySelectorAll('.tab-content');
+      tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          tabBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const tabId = btn.dataset.tab;
+          tabContents.forEach(content => {
+            content.classList.remove('active');
+            if (content.id === 'tab-' + tabId) {
+              content.classList.add('active');
+              content.querySelectorAll('.fade-in-up, .fade-in-left, .fade-in-right').forEach(el => {
+                el.classList.remove('visible');
+                requestAnimationFrame(() => { requestAnimationFrame(() => el.classList.add('visible')); });
+              });
+              lucide.createIcons();
+            }
+          });
+        });
+      });
+    }
+
+    const modalData = {
+      'match-detail1': { title:'比赛详情 — 实时直播', desc:'双方队徽+实时比分+进度条', images:['assets/goall/components/比赛详情-直播中.png'] },
+      'match-detail2': { title:'比赛详情 — 技术统计', desc:'控球率、射门、射正等数据可视化', images:['assets/goall/components/比赛详情-直播中2.png'] },
+      'match-detail3': { title:'比赛详情 — 进攻心率图', desc:'时间轴可视化比赛节奏', images:['assets/goall/components/比赛详情-直播中3.png'] },
+      'match-pending': { title:'比赛详情 — 赛前预告', desc:'未开始状态信息展示', images:['assets/goall/components/比赛详情-未开始.png'] }
+    };
+
+    function openModal(key) {
+      const data = modalData[key];
+      if (!data) return;
+      const modal = document.getElementById('previewModal');
+      document.getElementById('modalTitle').textContent = data.title;
+      document.getElementById('modalDesc').textContent = data.desc;
+      document.getElementById('modalImages').innerHTML = data.images.map(src =>
+        '<div class="modal-img-item"><img src="' + src + '" alt="' + data.title + '"></div>'
+      ).join('');
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      lucide.createIcons();
+    }
+
+    function closeModal(e) {
+      if (e && e.target !== e.currentTarget && !e.target.closest('.modal-close')) return;
+      document.getElementById('previewModal').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+  </script>
+
+</body>
+</html>

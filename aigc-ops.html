@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIGC 助力运营 - 蔡文杰作品集</title>
+  <meta name="description" content="AIGC 助力运营：运用 AI 工具赋能运营设计，覆盖 IP 设计、Banner、宣传 H5、PPT 全链路。">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['"Noto Sans SC"', 'Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            ocean: { 50:'#ecfeff',100:'#cffafe',200:'#a5f3fc',300:'#67e8f9',400:'#22d3ee',500:'#06b6d4',600:'#0891b2',700:'#0e7490',800:'#155e75',900:'#164e63' },
+            deep: { 900:'#0a1628',800:'#0f2847',700:'#1a3a5c' },
+            sky: { 400:'#38bdf8',500:'#0ea5e9',600:'#0284c7' },
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    html { scroll-behavior: smooth; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #f0f7f4; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, #06b6d4, #10b981); border-radius: 4px; }
+    body { background: #f0f7f4; color: #1e293b; overflow-x: hidden; }
+
+    /* 导航栏 */
+    #navbar { background: transparent; transition: all 0.4s ease; }
+    #navbar.scrolled { background: rgba(240,247,244,.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(6,182,212,.08); box-shadow: 0 4px 20px rgba(6,182,212,.06); }
+
+    /* 渐变文字 */
+    .gradient-text { background: linear-gradient(135deg, #0891b2 0%, #0ea5e9 50%, #059669 100%); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: gradient-shift 4s ease infinite; }
+    @keyframes gradient-shift { 0%,100% { background-position: 0% center; } 50% { background-position: 100% center; } }
+
+    /* 入场动画 */
+    .fade-in-up { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .fade-in-up.visible { opacity: 1; transform: translateY(0); }
+    .fade-in-left { opacity: 0; transform: translateX(-40px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .fade-in-left.visible { opacity: 1; transform: translateX(0); }
+    .fade-in-right { opacity: 0; transform: translateX(40px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .fade-in-right.visible { opacity: 1; transform: translateX(0); }
+
+    /* 汉堡菜单 */
+    .menu-toggle span { display: block; width: 24px; height: 2px; background: #334155; border-radius: 2px; transition: all 0.3s ease; transform-origin: center; }
+    .menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(5px,5px); }
+    .menu-toggle.active span:nth-child(2) { opacity: 0; }
+    .menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
+
+    /* 返回按钮 */
+    .back-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: rgba(255,255,255,.7); backdrop-filter: blur(10px); border: 1px solid rgba(6,182,212,.15); border-radius: 12px; color: #0891b2; font-weight: 500; font-size: 14px; transition: all 0.3s ease; text-decoration: none; }
+    .back-btn:hover { background: rgba(6,182,212,.1); color: #06b6d4; border-color: rgba(6,182,212,.3); }
+
+    /* 导航链接 */
+    .nav-link { position: relative; color: #64748b; font-weight: 500; transition: color 0.3s ease; }
+    .nav-link:hover { color: #0891b2; }
+    .nav-link::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px; background: linear-gradient(90deg, #06b6d4, #10b981); transition: width 0.3s ease; }
+    .nav-link:hover::after { width: 100%; }
+
+    /* 英雄区 */
+    .hero-section { position: relative; min-height: 70vh; display: flex; align-items: center; justify-content: center; overflow: hidden; background: linear-gradient(180deg, #e0f5ee 0%, #ccf0f0 30%, #e8f4f8 60%, #f0f7f4 100%); }
+    .hero-section::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 30%, rgba(6,182,212,.06) 0%, transparent 60%); }
+
+    /* 分割线 */
+    .section-divider { width: 48px; height: 3px; background: linear-gradient(90deg, #06b6d4, #10b981); border-radius: 2px; margin: 0 auto; }
+
+    /* 副标题装饰线 */
+    .subtitle-line { display: flex; align-items: center; gap: 12px; justify-content: center; margin-bottom: 8px; }
+    .subtitle-line::before, .subtitle-line::after { content: ''; width: 32px; height: 1px; background: linear-gradient(90deg, transparent, rgba(6,182,212,.3), transparent); }
+
+    /* 玻璃卡片 */
+    .glass-card { background: rgba(255,255,255,.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(6,182,212,.1); border-radius: 16px; transition: all 0.4s ease; }
+    .glass-card:hover { background: rgba(255,255,255,.8); border-color: rgba(6,182,212,.2); }
+
+    /* 主截图展示 - 不完整显示效果 */
+    .main-screenshot { position: relative; border-radius: 20px; overflow: hidden; background: rgba(255,255,255,.5); border: 1px solid rgba(6,182,212,.1); box-shadow: 0 8px 32px rgba(6,182,212,.08); }
+    .main-screenshot img { width: 100%; display: block; object-fit: cover; object-position: top center; }
+
+    /* IP 三视图 - 使用 img 标签确保高清显示 */
+    .ip-view-wrap { border-radius: 12px; overflow: hidden; background: #fff; border: 1px solid rgba(6,182,212,.1); transition: all 0.3s ease; box-shadow: 0 4px 16px rgba(6,182,212,.06); }
+    .ip-view-wrap:hover { border-color: rgba(6,182,212,.3); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(6,182,212,.12); }
+    .ip-view-wrap img { width: 100%; aspect-ratio: 1; object-fit: contain; display: block; }
+
+    /* IP 表情延展 - CSS 裁剪确保精确居中 */
+    .ip-expr-wrap { border-radius: 12px; overflow: hidden; background: #fff; border: 1px solid rgba(6,182,212,.1); transition: all 0.3s ease; box-shadow: 0 4px 16px rgba(6,182,212,.06); }
+    .ip-expr-wrap:hover { border-color: rgba(6,182,212,.3); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(6,182,212,.12); }
+    .ip-expr-wrap .ip-expr-bg { width: 100%; aspect-ratio: 1; background-size: 300% 200%; background-repeat: no-repeat; background-color: #f8fafb; }
+    .ip-expr-1 .ip-expr-bg { background-position: left top; }
+    .ip-expr-2 .ip-expr-bg { background-position: center top; }
+    .ip-expr-3 .ip-expr-bg { background-position: right top; }
+    .ip-expr-4 .ip-expr-bg { background-position: left bottom; }
+    .ip-expr-5 .ip-expr-bg { background-position: center bottom; }
+    .ip-expr-6 .ip-expr-bg { background-position: right bottom; }
+
+    /* Banner 卡片 */
+    .banner-card { border-radius: 16px; overflow: hidden; background: #fff; border: 1px solid rgba(6,182,212,.1); transition: all 0.4s ease; cursor: pointer; box-shadow: 0 4px 16px rgba(6,182,212,.06); }
+    .banner-card:hover { border-color: rgba(6,182,212,.3); transform: translateY(-4px); box-shadow: 0 16px 40px rgba(6,182,212,.12); }
+    .banner-card img { width: 100%; display: block; object-fit: contain; }
+
+    /* H5 手机模型 */
+    .h5-mockup { position: relative; width: 260px; background: #fff; border-radius: 32px; padding: 10px; border: 1px solid rgba(6,182,212,.12); transition: all 0.3s ease; box-shadow: 0 8px 32px rgba(6,182,212,.08); }
+    .h5-mockup:hover { border-color: rgba(6,182,212,.3); transform: translateY(-4px); box-shadow: 0 20px 40px rgba(6,182,212,.15); }
+    .h5-screen { border-radius: 24px; overflow: hidden; background: #f8fafb; }
+    .h5-screen img { width: 100%; display: block; object-fit: contain; }
+
+    /* 模态框 */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    .modal-content { background: #fff; border-radius: 24px; max-width: 1000px; width: 100%; max-height: 90vh; overflow-y: auto; transform: scale(0.9) translateY(20px); transition: transform 0.3s ease; box-shadow: 0 40px 80px rgba(0,0,0,.2); border: 1px solid rgba(6,182,212,.1); }
+    .modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
+    .modal-close { position: absolute; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,.06); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; transition: all 0.2s ease; }
+    .modal-close:hover { background: rgba(0,0,0,.12); transform: scale(1.1); }
+
+    /* 脉冲 */
+    .animate-pulse-slow { animation: pulse-slow 4s ease-in-out infinite; }
+    @keyframes pulse-slow { 0%,100% { opacity: .3; transform: scale(1); } 50% { opacity: .5; transform: scale(1.1); } }
+
+    /* 统计卡片 */
+    .stat-card { padding: 20px; border-radius: 16px; background: #fff; border: 1px solid rgba(6,182,212,.1); text-align: center; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(6,182,212,.04); }
+    .stat-card:hover { background: #f0fdf9; border-color: rgba(6,182,212,.25); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(6,182,212,.1); }
+
+    /* 标签 */
+    .tool-tag { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 9999px; background: rgba(6,182,212,.06); border: 1px solid rgba(6,182,212,.12); color: #0891b2; font-size: 13px; font-weight: 500; transition: all 0.3s ease; }
+    .tool-tag:hover { background: rgba(6,182,212,.12); border-color: rgba(6,182,212,.25); }
+
+    /* 关键词标签 */
+    .keyword-tag { display: inline-flex; padding: 6px 16px; border-radius: 9999px; background: rgba(6,182,212,.04); border: 1px solid rgba(6,182,212,.1); color: #64748b; font-size: 13px; transition: all 0.3s ease; }
+    .keyword-tag:hover { background: rgba(6,182,212,.08); border-color: rgba(6,182,212,.2); color: #0891b2; }
+
+    /* 亮点卡片 */
+    .highlight-card { padding: 24px; border-radius: 16px; background: #fff; border: 1px solid rgba(6,182,212,.1); transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(6,182,212,.04); }
+    .highlight-card:hover { background: #f0fdf9; border-color: rgba(6,182,212,.25); transform: translateY(-4px); box-shadow: 0 12px 32px rgba(6,182,212,.1); }
+
+    /* 响应式 */
+    @media (max-width: 768px) {
+      .h5-mockup { width: 200px; }
+      .ip-view-wrap, .ip-expr-wrap { border-radius: 8px; }
+    }
+  </style>
+</head>
+
+<body class="font-sans">
+
+  <!-- ==================== 导航栏 ==================== -->
+  <nav id="navbar" class="fixed top-0 left-0 right-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 md:h-20">
+        <a href="index.html" class="flex items-center gap-3 group">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-ocean-500 to-emerald-500 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-ocean-500/30">
+            <i data-lucide="sparkles" class="w-5 h-5"></i>
+          </div>
+          <span class="hidden sm:block text-sm md:text-base font-bold tracking-wide text-slate-800">AIGC<span class="text-ocean-600">Ops</span></span>
+        </a>
+
+        <!-- 桌面端导航 -->
+        <div class="hidden md:flex items-center gap-8">
+          <a href="#overview" class="nav-link text-sm">项目概述</a>
+          <a href="#ip" class="nav-link text-sm">IP 设计</a>
+          <a href="#banner" class="nav-link text-sm">Banner</a>
+          <a href="#h5" class="nav-link text-sm">宣传 H5</a>
+          <a href="#ppt" class="nav-link text-sm">PPT</a>
+          <a href="#results" class="nav-link text-sm">项目成果</a>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <a href="index.html" class="back-btn">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">返回作品集</span>
+          </a>
+          <!-- 移动端菜单按钮 -->
+          <button id="menuToggle" class="menu-toggle md:hidden flex flex-col gap-1.5 p-2" aria-label="菜单">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 移动端菜单 -->
+    <div id="mobileMenu" class="hidden md:hidden px-4 pb-4">
+      <div class="glass-card p-4 flex flex-col gap-3">
+        <a href="#overview" class="text-slate-600 hover:text-ocean-600 py-2 px-4 rounded-lg hover:bg-ocean-50 transition-all text-sm font-medium">项目概述</a>
+        <a href="#ip" class="text-slate-600 hover:text-ocean-600 py-2 px-4 rounded-lg hover:bg-ocean-50 transition-all text-sm font-medium">IP 设计</a>
+        <a href="#banner" class="text-slate-600 hover:text-ocean-600 py-2 px-4 rounded-lg hover:bg-ocean-50 transition-all text-sm font-medium">Banner</a>
+        <a href="#h5" class="text-slate-600 hover:text-ocean-600 py-2 px-4 rounded-lg hover:bg-ocean-50 transition-all text-sm font-medium">宣传 H5</a>
+        <a href="#ppt" class="text-slate-600 hover:text-ocean-600 py-2 px-4 rounded-lg hover:bg-ocean-50 transition-all text-sm font-medium">PPT</a>
+        <a href="#results" class="text-slate-600 hover:text-ocean-600 py-2 px-4 rounded-lg hover:bg-ocean-50 transition-all text-sm font-medium">项目成果</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ==================== 英雄区 ==================== -->
+  <section class="hero-section">
+    <!-- 背景装饰 -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-ocean-400/8 rounded-full blur-3xl animate-pulse-slow"></div>
+      <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-emerald-400/8 rounded-full blur-3xl animate-pulse-slow" style="animation-delay:2s"></div>
+    </div>
+
+    <div class="hero-content relative z-10 text-center px-6">
+      <div class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-ocean-500/10 border border-ocean-500/20 text-ocean-600 text-sm font-medium mb-8">
+        <i data-lucide="zap" class="w-4 h-4"></i>
+        AI 赋能运营设计
+      </div>
+      <h1 class="text-5xl md:text-7xl lg:text-8xl font-black mb-6 tracking-tight">
+        <span class="gradient-text">AIGC 助力运营</span>
+      </h1>
+      <p class="text-lg md:text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed">
+        运用 AI 工具赋能运营设计，覆盖 <span class="text-ocean-600 font-medium">IP 设计</span> / <span class="text-ocean-600 font-medium">Banner</span> / <span class="text-ocean-600 font-medium">宣传 H5</span> / <span class="text-ocean-600 font-medium">PPT</span> 全链路
+      </p>
+    </div>
+
+    <!-- 底部渐变过渡 -->
+    <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#f0f7f4] to-transparent"></div>
+  </section>
+
+  <!-- ==================== 项目概述 ==================== -->
+  <section id="overview" class="py-24 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16 fade-in-up">
+        <div class="subtitle-line mb-4">
+          <span class="text-ocean-500 text-xs font-semibold tracking-widest uppercase">Overview</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold text-slate-800 mb-4">项目概述</h2>
+        <p class="text-slate-400 max-w-xl mx-auto text-sm leading-relaxed">以 AI 为核心驱动力，重新定义运营设计的工作流与视觉表达</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start mb-16">
+        <!-- 左侧：封面图 -->
+        <div class="fade-in-left">
+          <div class="main-screenshot" style="max-height:380px;overflow:hidden">
+            <img src="assets/aigc-ops/封面.png" alt="项目封面" style="width:100%;object-fit:cover;object-position:top">
+          </div>
+        </div>
+
+        <!-- 右侧：设计理念 -->
+        <div class="fade-in-right">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-8 h-8 rounded-lg bg-ocean-500/10 flex items-center justify-center">
+              <i data-lucide="lightbulb" class="w-4 h-4 text-ocean-600"></i>
+            </div>
+            <h3 class="text-xl font-bold text-slate-800">设计理念</h3>
+          </div>
+          <p class="text-slate-500 text-[15px] leading-[1.8] mb-5">
+            在运营设计领域，AIGC 技术的引入大幅提升了创意产出效率。通过即梦、GPT image 2、LiblibAI、Lovart、星流等 AI 图像生成工具，实现了从创意构思到视觉落地的高效闭环。
+          </p>
+          <p class="text-slate-500 text-[15px] leading-[1.8] mb-8">
+            项目覆盖三个业务线的运营设计需求：AI斩书（教育）、未来慧学（教育）、足球赛事（体育），涵盖 IP 形象设计、Banner 广告、移动端 H5 宣传页、数据可视化 PPT 等多种运营物料。
+          </p>
+          <div class="flex flex-wrap gap-2.5">
+            <span class="tool-tag"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> 即梦</span>
+            <span class="tool-tag"><i data-lucide="brain" class="w-3.5 h-3.5"></i> GPT image 2</span>
+            <span class="tool-tag"><i data-lucide="image" class="w-3.5 h-3.5"></i> LiblibAI</span>
+            <span class="tool-tag"><i data-lucide="wand-2" class="w-3.5 h-3.5"></i> Lovart</span>
+            <span class="tool-tag"><i data-lucide="star" class="w-3.5 h-3.5"></i> 星流</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 统计卡片 -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-5 fade-in-up">
+        <div class="stat-card">
+          <div class="text-3xl font-bold gradient-text mb-1">IP</div>
+          <div class="text-slate-400 text-xs tracking-wide">形象设计</div>
+        </div>
+        <div class="stat-card">
+          <div class="text-3xl font-bold gradient-text mb-1">5</div>
+          <div class="text-slate-400 text-xs tracking-wide">Banner 设计</div>
+        </div>
+        <div class="stat-card">
+          <div class="text-3xl font-bold gradient-text mb-1">4</div>
+          <div class="text-slate-400 text-xs tracking-wide">宣传 H5</div>
+        </div>
+        <div class="stat-card">
+          <div class="text-3xl font-bold gradient-text mb-1">2</div>
+          <div class="text-slate-400 text-xs tracking-wide">PPT 设计</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== IP 设计 ==================== -->
+  <section id="ip" class="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#e8f5f0] to-[#f0f7f4]">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16 fade-in-up">
+        <div class="subtitle-line mb-4">
+          <span class="text-ocean-500 text-xs font-semibold tracking-widest uppercase">IP Design</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold text-slate-800 mb-4">IP 形象设计</h2>
+        <p class="text-slate-400 max-w-xl mx-auto text-sm leading-relaxed">以柯基犬为原型，打造亲和力与辨识度兼备的品牌 IP 形象</p>
+      </div>
+
+      <!-- 三视图展示 -->
+      <div class="mb-16 fade-in-up">
+        <h3 class="text-lg font-semibold text-slate-700 mb-6 text-center">三视图展示</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div class="text-center">
+            <div class="ip-view-wrap mb-3">
+              <img src="assets/aigc-ops/IP三视图-正视图.png" alt="正视图">
+            </div>
+            <span class="text-sm text-slate-500 font-medium">正视图</span>
+          </div>
+          <div class="text-center">
+            <div class="ip-view-wrap mb-3">
+              <img src="assets/aigc-ops/IP三视图-侧视图.png" alt="侧视图">
+            </div>
+            <span class="text-sm text-slate-500 font-medium">侧视图</span>
+          </div>
+          <div class="text-center">
+            <div class="ip-view-wrap mb-3">
+              <img src="assets/aigc-ops/IP三视图-后视图.png" alt="后视图">
+            </div>
+            <span class="text-sm text-slate-500 font-medium">后视图</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 表情延展 + 物料展示 -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+        <!-- 左侧：表情延展 -->
+        <div class="fade-in-left">
+          <h3 class="text-lg font-semibold text-slate-700 mb-6 text-center">IP 表情延展</h3>
+          <div class="grid grid-cols-3 gap-4 mb-4">
+            <div class="text-center ip-expr-1">
+              <div class="ip-expr-wrap mb-2">
+                <div class="ip-expr-bg" style="background-image:url('assets/aigc-ops/IP表情延展-合集.png')"></div>
+              </div>
+              <span class="text-xs text-slate-500">站立</span>
+            </div>
+            <div class="text-center ip-expr-2">
+              <div class="ip-expr-wrap mb-2">
+                <div class="ip-expr-bg" style="background-image:url('assets/aigc-ops/IP表情延展-合集.png')"></div>
+              </div>
+              <span class="text-xs text-slate-500">开心</span>
+            </div>
+            <div class="text-center ip-expr-3">
+              <div class="ip-expr-wrap mb-2">
+                <div class="ip-expr-bg" style="background-image:url('assets/aigc-ops/IP表情延展-合集.png')"></div>
+              </div>
+              <span class="text-xs text-slate-500">趴趴</span>
+            </div>
+            <div class="text-center ip-expr-4">
+              <div class="ip-expr-wrap mb-2">
+                <div class="ip-expr-bg" style="background-image:url('assets/aigc-ops/IP表情延展-合集.png')"></div>
+              </div>
+              <span class="text-xs text-slate-500">招手</span>
+            </div>
+            <div class="text-center ip-expr-5">
+              <div class="ip-expr-wrap mb-2">
+                <div class="ip-expr-bg" style="background-image:url('assets/aigc-ops/IP表情延展-合集.png')"></div>
+              </div>
+              <span class="text-xs text-slate-500">害羞</span>
+            </div>
+            <div class="text-center ip-expr-6">
+              <div class="ip-expr-wrap mb-2">
+                <div class="ip-expr-bg" style="background-image:url('assets/aigc-ops/IP表情延展-合集.png')"></div>
+              </div>
+              <span class="text-xs text-slate-500">坐着</span>
+            </div>
+          </div>
+          <p class="text-center text-slate-400 text-sm">6 种表情姿态，适配不同运营场景</p>
+        </div>
+
+        <!-- 右侧：物料展示 -->
+        <div class="fade-in-right">
+          <h3 class="text-lg font-semibold text-slate-700 mb-6 text-center">IP 周边物料</h3>
+          <div class="glass-card p-4 rounded-2xl">
+            <img src="assets/aigc-ops/IP物料展示.png" alt="IP 周边物料" class="w-full rounded-xl" style="object-fit:contain">
+          </div>
+          <p class="text-center text-slate-400 text-sm mt-4">手机壳、T恤、杯子、围巾等多品类物料延展</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== Banner 设计 ==================== -->
+  <section id="banner" class="py-24 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16 fade-in-up">
+        <div class="subtitle-line mb-4">
+          <span class="text-ocean-500 text-xs font-semibold tracking-widest uppercase">Banner</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold text-slate-800 mb-4">Banner 设计</h2>
+        <p class="text-slate-400 max-w-xl mx-auto text-sm leading-relaxed">为三大业务线打造视觉统一、信息清晰的运营 Banner</p>
+      </div>
+
+      <!-- Banner 详细展示 -->
+      <div class="glass-card rounded-2xl p-8 mb-16 fade-in-up">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          <!-- 左侧：Banner 大图 -->
+          <div class="rounded-xl overflow-hidden border border-slate-200/50">
+            <img src="assets/aigc-ops/banner-AI斩书1.png" alt="AI斩书 Banner" class="w-full" style="object-fit:contain">
+          </div>
+
+          <!-- 右侧：设计思路 -->
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-ocean-500/10 border border-ocean-500/20 text-ocean-600 text-xs font-medium mb-4">
+              AI斩书 · Banner 设计
+            </div>
+            <h3 class="text-xl font-bold text-slate-800 mb-6">设计思路</h3>
+
+            <div class="space-y-5">
+              <div>
+                <h4 class="text-sm font-semibold text-ocean-600 mb-2">✦ 创意调研与关键词提炼</h4>
+                <p class="text-slate-500 text-sm leading-relaxed">重点搜集 AI 教育类活动 Banner，比如错题管理、智能学习等方向，提炼关键词：「AI」「错题」「3D 图标」「科技感」，确定视觉方向以蓝色科技风为主基调。</p>
+              </div>
+              <div>
+                <h4 class="text-sm font-semibold text-ocean-600 mb-2">✦ 视觉问题分析</h4>
+                <p class="text-slate-500 text-sm leading-relaxed">初版设计存在视觉层次不够突出、3D 元素与背景融合度不足、信息层级需要优化等问题。主标题与副标题之间缺乏足够的视觉分隔。</p>
+              </div>
+              <div>
+                <h4 class="text-sm font-semibold text-ocean-600 mb-2">✦ 视觉升级与信息层级重构</h4>
+                <p class="text-slate-500 text-sm leading-relaxed">将主标题放大强化视觉冲击力，3D 图标作为视觉锚点重构信息层级，突出核心功能卖点。底部功能标签区采用图标+文字组合提升可读性，整体画面层次分明。</p>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2 mt-6">
+              <span class="keyword-tag">AI</span>
+              <span class="keyword-tag">科技感</span>
+              <span class="keyword-tag">错题管理</span>
+              <span class="keyword-tag">3D 图标</span>
+              <span class="keyword-tag">蓝色渐变</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Banner 总览网格 -->
+      <h3 class="text-lg font-semibold text-slate-700 mb-8 text-center fade-in-up">Banner 总览</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 fade-in-up">
+        <!-- AI斩书 Banner 1 -->
+        <div class="banner-card" onclick="openBannerModal(0)">
+          <div class="p-3">
+            <img src="assets/aigc-ops/banner-AI斩书1.png" alt="AI斩书 Banner 1">
+          </div>
+          <div class="px-4 pb-4">
+            <span class="text-xs font-semibold text-ocean-600 uppercase tracking-wider">AI斩书</span>
+            <p class="text-sm text-slate-500 mt-1">「错题不再错」主视觉，蓝色科技风 + 3D 图标</p>
+          </div>
+        </div>
+        <!-- AI斩书 Banner 2 -->
+        <div class="banner-card" onclick="openBannerModal(1)">
+          <div class="p-3">
+            <img src="assets/aigc-ops/banner-AI斩书2.png" alt="AI斩书 Banner 2">
+          </div>
+          <div class="px-4 pb-4">
+            <span class="text-xs font-semibold text-ocean-600 uppercase tracking-wider">AI斩书</span>
+            <p class="text-sm text-slate-500 mt-1">「AI斩书·错题不再错」品牌 Banner，强化品牌认知</p>
+          </div>
+        </div>
+        <!-- 未来慧学 Banner 1 -->
+        <div class="banner-card" onclick="openBannerModal(2)">
+          <div class="p-3">
+            <img src="assets/aigc-ops/banner-未来慧学1.png" alt="未来慧学 Banner 1">
+          </div>
+          <div class="px-4 pb-4">
+            <span class="text-xs font-semibold text-emerald-600 uppercase tracking-wider">未来慧学</span>
+            <p class="text-sm text-slate-500 mt-1">「陪你快乐成长」，蓝绿渐变 + 火箭书本元素</p>
+          </div>
+        </div>
+        <!-- 未来慧学 Banner 2 -->
+        <div class="banner-card" onclick="openBannerModal(3)">
+          <div class="p-3">
+            <img src="assets/aigc-ops/banner-未来慧学2.png" alt="未来慧学 Banner 2">
+          </div>
+          <div class="px-4 pb-4">
+            <span class="text-xs font-semibold text-emerald-600 uppercase tracking-wider">未来慧学</span>
+            <p class="text-sm text-slate-500 mt-1">品牌角色 + 书本场景，温馨教育风格</p>
+          </div>
+        </div>
+        <!-- 足球赛事 Banner -->
+        <div class="banner-card sm:col-span-2 lg:col-span-1" onclick="openBannerModal(4)">
+          <div class="p-3">
+            <img src="assets/aigc-ops/banner-足球赛事.png" alt="足球赛事 Banner">
+          </div>
+          <div class="px-4 pb-4">
+            <span class="text-xs font-semibold text-purple-600 uppercase tracking-wider">足球赛事</span>
+            <p class="text-sm text-slate-500 mt-1">「绿茵巅峰 足球GOALL」，紫色运动风 + 动感排版</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 宣传 H5 ==================== -->
+  <section id="h5" class="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#e8f5f0] to-[#f0f7f4]">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16 fade-in-up">
+        <div class="subtitle-line mb-4">
+          <span class="text-ocean-500 text-xs font-semibold tracking-widest uppercase">H5</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold text-slate-800 mb-4">宣传 H5</h2>
+        <p class="text-slate-400 max-w-xl mx-auto text-sm leading-relaxed">为活动推广打造沉浸式移动端宣传页面</p>
+      </div>
+
+      <!-- H5 项目展示 -->
+      <div class="space-y-20">
+        <!-- AI斩书 H5 (1) -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center fade-in-left">
+          <div class="flex justify-center">
+            <div class="h5-mockup">
+              <div class="h5-screen">
+                <img src="assets/aigc-ops/h5-AI斩书1.png" alt="AI斩书宣传 H5">
+              </div>
+            </div>
+          </div>
+          <div>
+            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-ocean-500/10 border border-ocean-500/20 text-ocean-600 text-xs font-medium mb-4">AI斩书</span>
+            <h3 class="text-xl font-bold text-slate-800 mb-4">「拍照搞定错题」宣传页</h3>
+            <p class="text-slate-500 leading-relaxed mb-4">以「拍照搞定错题」为核心卖点，通过 AIGC 生成 3D 场景插画，将产品功能可视化。画面采用蓝色科技风基调，搭配卡通角色引导用户操作。</p>
+            <div class="space-y-2">
+              <div class="flex items-start gap-3">
+                <div class="w-5 h-5 rounded-full bg-ocean-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <i data-lucide="check" class="w-3 h-3 text-ocean-600"></i>
+                </div>
+                <span class="text-slate-500 text-sm">AIGC 生成 3D 场景，提升画面科技感</span>
+              </div>
+              <div class="flex items-start gap-3">
+                <div class="w-5 h-5 rounded-full bg-ocean-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <i data-lucide="check" class="w-3 h-3 text-ocean-600"></i>
+                </div>
+                <span class="text-slate-500 text-sm">卡通角色引导，增强用户亲和力</span>
+              </div>
+              <div class="flex items-start gap-3">
+                <div class="w-5 h-5 rounded-full bg-ocean-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <i data-lucide="check" class="w-3 h-3 text-ocean-600"></i>
+                </div>
+                <span class="text-slate-500 text-sm">信息层级清晰，核心卖点一目了然</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 未来慧学 H5 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center fade-in-right">
+          <div class="order-2 lg:order-1">
+            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-xs font-medium mb-4">未来慧学</span>
+            <h3 class="text-xl font-bold text-slate-800 mb-4">「AI赋能智慧教育」宣传页</h3>
+            <p class="text-slate-500 leading-relaxed mb-4">以蓝绿渐变为主色调，营造清新、智慧的教育氛围。通过 AIGC 生成教育场景插画，展现 AI 赋能学习的核心理念，视觉风格温馨且富有科技感。</p>
+            <div class="space-y-2">
+              <div class="flex items-start gap-3">
+                <div class="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <i data-lucide="check" class="w-3 h-3 text-emerald-600"></i>
+                </div>
+                <span class="text-slate-500 text-sm">蓝绿渐变基调，清新智慧感</span>
+              </div>
+              <div class="flex items-start gap-3">
+                <div class="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <i data-lucide="check" class="w-3 h-3 text-emerald-500"></i>
+                </div>
+                <span class="text-slate-500 text-sm">AIGC 教育场景插画，传递品牌理念</span>
+              </div>
+              <div class="flex items-start gap-3">
+                <div class="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <i data-lucide="check" class="w-3 h-3 text-emerald-500"></i>
+                </div>
+                <span class="text-slate-500 text-sm">图文并茂，功能亮点突出</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex justify-center order-1 lg:order-2">
+            <div class="h5-mockup">
+              <div class="h5-screen">
+                <img src="assets/aigc-ops/h5-未来慧学.png" alt="未来慧学宣传 H5">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI斩书 H5 (2) -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center fade-in-left">
+          <div class="flex justify-center">
+            <div class="h5-mockup">
+              <div class="h5-screen">
+                <img src="assets/aigc-ops/h5-AI斩书2.png" alt="AI斩书宣传 H5 (2)">
+              </div>
+            </div>
+          </div>
+          <div>
+            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-ocean-500/10 border border-ocean-500/20 text-ocean-600 text-xs font-medium mb-4">AI斩书</span>
+            <h3 class="text-xl font-bold text-slate-800 mb-4">功能介绍宣传页</h3>
+            <p class="text-slate-500 leading-relaxed mb-4">延续 AI斩书品牌视觉语言，以功能模块展示为核心，通过卡片式布局清晰呈现产品各项功能。AIGC 辅助生成图标与装饰元素，保持视觉一致性。</p>
+            <div class="space-y-2">
+              <div class="flex items-start gap-3">
+                <div class="w-5 h-5 rounded-full bg-ocean-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <i data-lucide="check" class="w-3 h-3 text-ocean-600"></i>
+                </div>
+                <span class="text-slate-500 text-sm">卡片式功能布局，信息架构清晰</span>
+              </div>
+              <div class="flex items-start gap-3">
+                <div class="w-5 h-5 rounded-full bg-ocean-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <i data-lucide="check" class="w-3 h-3 text-ocean-600"></i>
+                </div>
+                <span class="text-slate-500 text-sm">品牌视觉一致，强化用户认知</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 足球赛事 H5 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center fade-in-right">
+          <div class="order-2 lg:order-1">
+            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-600 text-xs font-medium mb-4">足球赛事</span>
+            <h3 class="text-xl font-bold text-slate-800 mb-4">「绿茵巅峰 足球盛宴」宣传页</h3>
+            <p class="text-slate-500 leading-relaxed mb-4">以紫色运动风为主调，结合足球赛事的激情与活力。通过 AIGC 生成足球场景插画，搭配动感排版与数据可视化元素，营造赛事氛围。</p>
+            <div class="space-y-2">
+              <div class="flex items-start gap-3">
+                <div class="w-5 h-5 rounded-full bg-purple-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <i data-lucide="check" class="w-3 h-3 text-purple-600"></i>
+                </div>
+                <span class="text-slate-500 text-sm">紫色运动风，激情赛事氛围</span>
+              </div>
+              <div class="flex items-start gap-3">
+                <div class="w-5 h-5 rounded-full bg-purple-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <i data-lucide="check" class="w-3 h-3 text-purple-500"></i>
+                </div>
+                <span class="text-slate-500 text-sm">AIGC 足球场景，视觉冲击力强</span>
+              </div>
+              <div class="flex items-start gap-3">
+                <div class="w-5 h-5 rounded-full bg-purple-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <i data-lucide="check" class="w-3 h-3 text-purple-500"></i>
+                </div>
+                <span class="text-slate-500 text-sm">动感排版 + 数据可视化元素</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex justify-center order-1 lg:order-2">
+            <div class="h5-mockup">
+              <div class="h5-screen">
+                <img src="assets/aigc-ops/h5-足球赛事.png" alt="足球赛事宣传 H5">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== PPT 设计 ==================== -->
+  <section id="ppt" class="py-24 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16 fade-in-up">
+        <div class="subtitle-line mb-4">
+          <span class="text-ocean-500 text-xs font-semibold tracking-widest uppercase">PPT</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold text-slate-800 mb-4">PPT 数据可视化设计</h2>
+        <p class="text-slate-400 max-w-xl mx-auto text-sm leading-relaxed">工作整理与汇报性质的数据图表设计，清晰传达业务洞察</p>
+      </div>
+
+      <!-- PPT 并排展示 -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 fade-in-up">
+        <div class="glass-card rounded-2xl overflow-hidden">
+          <div class="p-4">
+            <img src="assets/aigc-ops/ppt-供应链.png" alt="供应链成本分析" class="w-full rounded-xl" style="object-fit:contain;aspect-ratio:16/10">
+          </div>
+          <div class="px-6 pb-6">
+            <h4 class="text-lg font-semibold text-slate-800 mb-2">供应链成本分析</h4>
+            <p class="text-slate-500 text-sm leading-relaxed">通过数据可视化图表呈现供应链各环节成本结构，辅助管理层进行成本优化决策。采用蓝色系配色，信息层次清晰。</p>
+          </div>
+        </div>
+        <div class="glass-card rounded-2xl overflow-hidden">
+          <div class="p-4">
+            <img src="assets/aigc-ops/ppt-新客转化.png" alt="新客转化分析" class="w-full rounded-xl" style="object-fit:contain;aspect-ratio:16/10">
+          </div>
+          <div class="px-6 pb-6">
+            <h4 class="text-lg font-semibold text-slate-800 mb-2">新客转化分析</h4>
+            <p class="text-slate-500 text-sm leading-relaxed">新用户转化漏斗与行为路径分析，通过图表直观展示各阶段转化率，为运营策略优化提供数据支撑。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 项目成果 ==================== -->
+  <section id="results" class="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#e8f5f0] to-[#f0f7f4]">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16 fade-in-up">
+        <div class="subtitle-line mb-4">
+          <span class="text-ocean-500 text-xs font-semibold tracking-widest uppercase">Results</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold text-slate-800 mb-4">项目成果</h2>
+        <p class="text-slate-400 max-w-xl mx-auto text-sm leading-relaxed">AIGC 赋能运营设计的核心价值与亮点</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 fade-in-up">
+        <div class="highlight-card text-center">
+          <div class="w-14 h-14 rounded-2xl bg-ocean-500/10 flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="zap" class="w-7 h-7 text-ocean-600"></i>
+          </div>
+          <h4 class="text-lg font-semibold text-slate-800 mb-2">AIGC 提效</h4>
+          <p class="text-slate-500 text-sm leading-relaxed">AI 工具大幅提升创意产出效率，缩短设计周期，实现快速迭代</p>
+        </div>
+        <div class="highlight-card text-center">
+          <div class="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="layers" class="w-7 h-7 text-emerald-500"></i>
+          </div>
+          <h4 class="text-lg font-semibold text-slate-800 mb-2">全链路覆盖</h4>
+          <p class="text-slate-500 text-sm leading-relaxed">从 IP 形象到 Banner、H5、PPT，覆盖运营设计全链路需求</p>
+        </div>
+        <div class="highlight-card text-center">
+          <div class="w-14 h-14 rounded-2xl bg-sky-500/10 flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="palette" class="w-7 h-7 text-sky-500"></i>
+          </div>
+          <h4 class="text-lg font-semibold text-slate-800 mb-2">视觉一致性</h4>
+          <p class="text-slate-500 text-sm leading-relaxed">三大业务线保持统一的品牌视觉语言，强化用户品牌认知</p>
+        </div>
+        <div class="highlight-card text-center">
+          <div class="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="bar-chart-3" class="w-7 h-7 text-purple-500"></i>
+          </div>
+          <h4 class="text-lg font-semibold text-slate-800 mb-2">数据驱动</h4>
+          <p class="text-slate-500 text-sm leading-relaxed">PPT 数据可视化设计，用数据说话，辅助业务决策</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 页脚 ==================== -->
+  <footer class="py-12 px-4 border-t border-slate-200/50">
+    <div class="max-w-6xl mx-auto text-center">
+      <div class="flex items-center justify-center gap-3 mb-4">
+        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-ocean-500 to-emerald-500 flex items-center justify-center">
+          <i data-lucide="sparkles" class="w-4 h-4 text-white"></i>
+        </div>
+        <span class="text-sm font-bold text-slate-800">AIGC 助力运营</span>
+      </div>
+      <p class="text-slate-400 text-sm mb-4">蔡文杰 · UI/UX 设计师</p>
+      <a href="index.html" class="inline-flex items-center gap-2 text-ocean-600 hover:text-ocean-500 text-sm font-medium transition-colors">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        返回作品集
+      </a>
+    </div>
+  </footer>
+
+  <!-- ==================== Banner 模态框 ==================== -->
+  <div id="bannerModal" class="modal-overlay" onclick="closeBannerModal(event)">
+    <div class="modal-content relative" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeBannerModal()">
+        <i data-lucide="x" class="w-5 h-5 text-slate-600"></i>
+      </button>
+      <div class="p-6">
+        <img id="modalBannerImg" src="" alt="Banner 大图" class="w-full rounded-xl" style="object-fit:contain">
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== JS ==================== -->
+  <script>
+    // Banner 图片列表
+    const bannerImages = [
+      'assets/aigc-ops/banner-AI斩书1.png',
+      'assets/aigc-ops/banner-AI斩书2.png',
+      'assets/aigc-ops/banner-未来慧学1.png',
+      'assets/aigc-ops/banner-未来慧学2.png',
+      'assets/aigc-ops/banner-足球赛事.png'
+    ];
+
+    // 初始化
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      initNavbar();
+      initMobileMenu();
+      initSmoothScroll();
+      initScrollAnimations();
+    });
+
+    // 导航栏滚动效果
+    function initNavbar() {
+      const navbar = document.getElementById('navbar');
+      window.addEventListener('scroll', () => {
+        if (window.pageYOffset > 50) {
+          navbar.classList.add('scrolled');
+        } else {
+          navbar.classList.remove('scrolled');
+        }
+      }, { passive: true });
+    }
+
+    // 移动端菜单
+    function initMobileMenu() {
+      const menuToggle = document.getElementById('menuToggle');
+      const mobileMenu = document.getElementById('mobileMenu');
+      let isOpen = false;
+
+      menuToggle.addEventListener('click', () => {
+        isOpen = !isOpen;
+        menuToggle.classList.toggle('active', isOpen);
+        if (isOpen) {
+          mobileMenu.classList.remove('hidden');
+          requestAnimationFrame(() => {
+            mobileMenu.querySelector('.glass-card').style.opacity = '0';
+            mobileMenu.querySelector('.glass-card').style.transform = 'translateY(-10px)';
+            requestAnimationFrame(() => {
+              mobileMenu.querySelector('.glass-card').style.transition = 'all 0.3s ease';
+              mobileMenu.querySelector('.glass-card').style.opacity = '1';
+              mobileMenu.querySelector('.glass-card').style.transform = 'translateY(0)';
+            });
+          });
+        } else {
+          mobileMenu.querySelector('.glass-card').style.opacity = '0';
+          mobileMenu.querySelector('.glass-card').style.transform = 'translateY(-10px)';
+          setTimeout(() => mobileMenu.classList.add('hidden'), 300);
+        }
+      });
+
+      mobileMenu.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          isOpen = false;
+          menuToggle.classList.remove('active');
+          mobileMenu.querySelector('.glass-card').style.opacity = '0';
+          mobileMenu.querySelector('.glass-card').style.transform = 'translateY(-10px)';
+          setTimeout(() => mobileMenu.classList.add('hidden'), 300);
+        });
+      });
+
+      document.addEventListener('click', (e) => {
+        if (isOpen && !menuToggle.contains(e.target) && !mobileMenu.contains(e.target)) {
+          isOpen = false;
+          menuToggle.classList.remove('active');
+          mobileMenu.querySelector('.glass-card').style.opacity = '0';
+          mobileMenu.querySelector('.glass-card').style.transform = 'translateY(-10px)';
+          setTimeout(() => mobileMenu.classList.add('hidden'), 300);
+        }
+      });
+    }
+
+    // 平滑滚动
+    function initSmoothScroll() {
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            const navbarHeight = document.getElementById('navbar').offsetHeight;
+            const targetPos = target.getBoundingClientRect().top + window.pageYOffset - navbarHeight;
+            window.scrollTo({ top: targetPos, behavior: 'smooth' });
+          }
+        });
+      });
+    }
+
+    // 滚动入场动画
+    function initScrollAnimations() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const delay = entry.target.style.animationDelay || '0s';
+            setTimeout(() => entry.target.classList.add('visible'), parseFloat(delay) * 1000);
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { rootMargin: '0px 0px -50px 0px', threshold: 0.1 });
+
+      document.querySelectorAll('.fade-in-up, .fade-in-left, .fade-in-right').forEach(el => observer.observe(el));
+    }
+
+    // Banner 模态框
+    function openBannerModal(index) {
+      document.getElementById('modalBannerImg').src = bannerImages[index];
+      document.getElementById('bannerModal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeBannerModal(e) {
+      if (e && e.target !== e.currentTarget) return;
+      document.getElementById('bannerModal').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeBannerModal();
+    });
+  </script>
+
+</body>
+</html>

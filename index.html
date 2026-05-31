@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>蔡文杰 | UI/UX 设计作品集</title>
+  <meta name="description" content="蔡文杰的个人作品集，展示UI/UX设计、网页设计、交互设计等项目作品。">
+
+  <!-- Tailwind CSS v3 CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide 图标库 -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Tailwind 自定义配置 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            dark: {
+              900: '#0a0a1a',
+              800: '#0f0a1a',
+              700: '#1a0a2e',
+            },
+            brand: {
+              purple: '#a855f7',
+              pink: '#ec4899',
+              blue: '#3b82f6',
+              violet: '#7c3aed',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- 自定义样式 -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="bg-dark-900 text-white font-sans overflow-x-hidden">
+
+  <!-- ==================== 顶部导航栏 ==================== -->
+  <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 md:h-20">
+        <!-- Logo -->
+        <a href="#hero" class="flex items-center gap-3 group">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-brand-purple to-brand-pink flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-brand-purple/30 group-hover:shadow-brand-purple/50 transition-shadow">
+            C
+          </div>
+          <span class="hidden sm:block text-sm md:text-base font-semibold tracking-wide">
+            <span class="text-white">Cai Wen Jie</span>
+            <span class="text-gray-400 ml-1">DESIGN PORTFOLIO</span>
+          </span>
+        </a>
+
+        <!-- 桌面端导航链接 -->
+        <div class="hidden md:flex items-center gap-8">
+          <a href="#hero" class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-brand-purple after:to-brand-pink after:transition-all after:duration-300 hover:after:w-full">首页</a>
+          <a href="#portfolio" class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-brand-purple after:to-brand-pink after:transition-all after:duration-300 hover:after:w-full">作品集</a>
+          <a href="#contact" class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-brand-purple after:to-brand-pink after:transition-all after:duration-300 hover:after:w-full">联系我</a>
+        </div>
+
+        <!-- 移动端汉堡菜单按钮 -->
+        <button id="menuToggle" class="md:hidden flex flex-col gap-1.5 p-2 group" aria-label="打开菜单">
+          <span class="block w-6 h-0.5 bg-white rounded-full transition-all duration-300 origin-center group-[.active]:rotate-45 group-[.active]:translate-y-2"></span>
+          <span class="block w-6 h-0.5 bg-white rounded-full transition-all duration-300 group-[.active]:opacity-0"></span>
+          <span class="block w-6 h-0.5 bg-white rounded-full transition-all duration-300 origin-center group-[.active]:-rotate-45 group-[.active]:-translate-y-2"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 移动端下拉菜单 -->
+    <div id="mobileMenu" class="md:hidden hidden">
+      <div class="glass-card mx-4 mt-2 rounded-2xl p-6 flex flex-col gap-4">
+        <a href="#hero" class="mobile-nav-link text-base font-medium text-gray-300 hover:text-white transition-colors py-2">首页</a>
+        <a href="#portfolio" class="mobile-nav-link text-base font-medium text-gray-300 hover:text-white transition-colors py-2">作品集</a>
+        <a href="#contact" class="mobile-nav-link text-base font-medium text-gray-300 hover:text-white transition-colors py-2">联系我</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ==================== 英雄区 ==================== -->
+  <section id="hero" class="relative h-screen overflow-hidden">
+    <!-- 背景光效 -->
+    <div class="absolute inset-0 pointer-events-none">
+      <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-purple/20 rounded-full blur-[120px] animate-pulse-slow"></div>
+      <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-brand-blue/15 rounded-full blur-[120px] animate-pulse-slow" style="animation-delay: 1s;"></div>
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-pink/10 rounded-full blur-[150px]"></div>
+    </div>
+
+    <!-- 英雄区主体：flex纵向布局 -->
+    <div class="relative h-full flex flex-col justify-between">
+      <!-- 上方：左右两栏居中 -->
+      <div class="flex-1 flex items-center">
+        <div class="max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 w-full">
+          <div class="flex flex-col lg:flex-row items-center gap-8 lg:gap-16">
+
+          <!-- 左侧栏：文字信息 -->
+          <div class="flex-1 text-center lg:text-left fade-in-up">
+            <p class="text-brand-pink text-sm md:text-base font-medium mb-2 tracking-wide">
+              Hello, I'm
+            </p>
+            <h1 class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black mb-3 gradient-text leading-none">
+              蔡文杰
+            </h1>
+            <p class="text-gray-400 text-base md:text-lg mb-8 max-w-lg mx-auto lg:mx-0">
+              UI/UX 设计师 · 专注用户体验与界面设计
+            </p>
+            <!-- 按钮组 -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              <a href="#portfolio" class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-brand-purple to-brand-pink text-white font-semibold rounded-2xl shadow-lg shadow-brand-purple/30 hover:shadow-brand-purple/50 hover:scale-105 transition-all duration-300 group">
+                查看我的作品
+                <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+              </a>
+              <a href="#contact" class="inline-flex items-center justify-center gap-2 px-8 py-4 border border-white/20 text-white font-semibold rounded-2xl hover:bg-white/10 hover:scale-105 transition-all duration-300 group">
+                联系我
+                <i data-lucide="send" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- 右侧栏：3D等距图标组合 -->
+          <div class="flex-1 flex items-center justify-center fade-in-up" style="animation-delay: 0.2s;">
+            <div class="isometric-container relative w-full max-w-[360px] aspect-square">
+              <!-- 环绕发光线条 -->
+              <div class="glow-ring glow-ring-1"></div>
+              <div class="glow-ring glow-ring-2"></div>
+              <div class="glow-ring glow-ring-3"></div>
+
+              <!-- 渐变光带 -->
+              <div class="ribbon ribbon-purple"></div>
+              <div class="ribbon ribbon-blue"></div>
+
+              <!-- 中心浏览器窗口 -->
+              <div class="browser-window">
+                <div class="browser-bar">
+                  <span class="browser-dot dot-red"></span>
+                  <span class="browser-dot dot-yellow"></span>
+                  <span class="browser-dot dot-green"></span>
+                </div>
+                <div class="browser-content">
+                  <p class="browser-title">UI/UX</p>
+                  <p class="browser-subtitle">产品设计</p>
+                </div>
+              </div>
+
+              <!-- 环绕的工具图标 -->
+              <div class="orbit-icon icon-figma" title="Figma">
+                <img src="assets/logo/figma.png" alt="Figma" class="w-6 h-6 object-contain">
+              </div>
+              <div class="orbit-icon icon-jishi" title="即时设计">
+                <img src="assets/logo/即时设计.png" alt="即时设计" class="w-6 h-6 object-contain">
+              </div>
+              <div class="orbit-icon icon-axure" title="Axure">
+                <img src="assets/logo/Axure.png" alt="Axure" class="w-6 h-6 object-contain">
+              </div>
+              <div class="orbit-icon icon-ps" title="Photoshop">
+                <img src="assets/logo/ps.png" alt="Photoshop" class="w-6 h-6 object-contain">
+              </div>
+              <div class="orbit-icon icon-ai" title="Illustrator">
+                <img src="assets/logo/Ai.png" alt="Illustrator" class="w-6 h-6 object-contain">
+              </div>
+              <div class="orbit-icon icon-claude" title="Claude Code">
+                <img src="assets/logo/Claude code.png" alt="Claude Code" class="w-6 h-6 object-contain">
+              </div>
+              <div class="orbit-icon icon-trae" title="Trae">
+                <img src="assets/logo/Trae.png" alt="Trae" class="w-6 h-6 object-contain">
+              </div>
+              <div class="orbit-icon icon-workbuddy" title="Work Buddy">
+                <img src="assets/logo/work Buddy.png" alt="Work Buddy" class="w-6 h-6 object-contain">
+              </div>
+              <div class="orbit-icon icon-feishu" title="飞书">
+                <img src="assets/logo/飞书.png" alt="飞书" class="w-6 h-6 object-contain">
+              </div>
+              <!-- Lucide 图标替代 -->
+              <div class="orbit-icon icon-code" title="代码">
+                <i data-lucide="code-2" class="w-5 h-5 text-brand-purple"></i>
+              </div>
+              <div class="orbit-icon icon-pen" title="钢笔">
+                <i data-lucide="pen-tool" class="w-5 h-5 text-brand-pink"></i>
+              </div>
+              <div class="orbit-icon icon-type" title="字体">
+                <i data-lucide="type" class="w-5 h-5 text-brand-blue"></i>
+              </div>
+              <div class="orbit-icon icon-toggle" title="开关">
+                <i data-lucide="toggle-right" class="w-5 h-5 text-green-400"></i>
+              </div>
+            </div>
+          </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- 底侧：四张玻璃拟态卡片 -->
+      <div class="relative max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 pb-6 pt-2">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+
+        <!-- 卡片1：个人信息 -->
+        <div class="glass-card p-5 md:p-6 rounded-2xl card-hover group fade-in-up">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-brand-purple/20 flex items-center justify-center">
+              <i data-lucide="user" class="w-5 h-5 text-brand-purple"></i>
+            </div>
+            <h3 class="text-base font-semibold">个人信息</h3>
+          </div>
+          <div class="space-y-2.5 text-sm text-gray-300 mb-5">
+            <div class="flex justify-between">
+              <span class="text-gray-500">姓 名</span>
+              <span>蔡文杰</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500">年 龄</span>
+              <span>24岁</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500">经 验</span>
+              <span>有相关工作经验</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500">所在地</span>
+              <span>广东·深圳</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500">学 历</span>
+              <span>本科</span>
+            </div>
+          </div>
+          <button class="w-full py-2.5 bg-gradient-to-r from-brand-purple to-brand-violet text-white text-sm font-medium rounded-xl hover:opacity-90 transition-opacity">
+            ABOUT ME
+          </button>
+        </div>
+
+        <!-- 卡片2：专业技能 -->
+        <div class="glass-card p-5 md:p-6 rounded-2xl card-hover group fade-in-up" style="animation-delay: 0.1s;">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-brand-blue/20 flex items-center justify-center">
+              <i data-lucide="code-2" class="w-5 h-5 text-brand-blue"></i>
+            </div>
+            <h3 class="text-base font-semibold">专业技能</h3>
+          </div>
+          <div class="mb-4">
+            <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">Software Skills</p>
+            <div class="flex flex-wrap gap-1.5">
+              <span class="glass-tag text-xs px-2.5 py-1 rounded-lg">Figma</span>
+              <span class="glass-tag text-xs px-2.5 py-1 rounded-lg">即时设计</span>
+              <span class="glass-tag text-xs px-2.5 py-1 rounded-lg">Axure</span>
+              <span class="glass-tag text-xs px-2.5 py-1 rounded-lg">PS</span>
+              <span class="glass-tag text-xs px-2.5 py-1 rounded-lg">Ai</span>
+              <span class="glass-tag text-xs px-2.5 py-1 rounded-lg">Claude Code</span>
+              <span class="glass-tag text-xs px-2.5 py-1 rounded-lg">Trae</span>
+              <span class="glass-tag text-xs px-2.5 py-1 rounded-lg">Work Buddy</span>
+            </div>
+          </div>
+          <div>
+            <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">Design Skills</p>
+            <div class="flex flex-wrap gap-1.5">
+              <span class="glass-tag text-xs px-2.5 py-1 rounded-lg">UI/UX Design</span>
+              <span class="glass-tag text-xs px-2.5 py-1 rounded-lg">Web Design</span>
+              <span class="glass-tag text-xs px-2.5 py-1 rounded-lg">Interaction Design</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 卡片3：设计工具 -->
+        <div class="glass-card p-5 md:p-6 rounded-2xl card-hover group fade-in-up" style="animation-delay: 0.2s;">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-brand-pink/20 flex items-center justify-center">
+              <i data-lucide="wrench" class="w-5 h-5 text-brand-pink"></i>
+            </div>
+            <h3 class="text-base font-semibold">设计工具</h3>
+          </div>
+          <div class="grid grid-cols-4 gap-2.5">
+            <div class="tool-logo-box">
+              <img src="assets/logo/figma.png" alt="Figma" class="w-7 h-7 object-contain">
+            </div>
+            <div class="tool-logo-box">
+              <img src="assets/logo/即时设计.png" alt="即时设计" class="w-7 h-7 object-contain">
+            </div>
+            <div class="tool-logo-box">
+              <img src="assets/logo/Axure.png" alt="Axure" class="w-7 h-7 object-contain">
+            </div>
+            <div class="tool-logo-box">
+              <img src="assets/logo/ps.png" alt="Photoshop" class="w-7 h-7 object-contain">
+            </div>
+            <div class="tool-logo-box">
+              <img src="assets/logo/Ai.png" alt="Illustrator" class="w-7 h-7 object-contain">
+            </div>
+            <div class="tool-logo-box">
+              <img src="assets/logo/Claude code.png" alt="Claude Code" class="w-7 h-7 object-contain">
+            </div>
+            <div class="tool-logo-box">
+              <img src="assets/logo/Trae.png" alt="Trae" class="w-7 h-7 object-contain">
+            </div>
+            <div class="tool-logo-box">
+              <img src="assets/logo/work Buddy.png" alt="Work Buddy" class="w-7 h-7 object-contain">
+            </div>
+          </div>
+        </div>
+
+        <!-- 卡片4：联系我 -->
+        <div class="glass-card p-5 md:p-6 rounded-2xl card-hover group fade-in-up" style="animation-delay: 0.3s;">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
+              <i data-lucide="phone" class="w-5 h-5 text-green-400"></i>
+            </div>
+            <h3 class="text-base font-semibold">联系我</h3>
+          </div>
+          <div class="space-y-4 text-sm">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="phone" class="w-4 h-4 text-gray-400"></i>
+              </div>
+              <div>
+                <p class="text-xs text-gray-500">电话</p>
+                <p class="text-gray-200">+86 15218730823</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="mail" class="w-4 h-4 text-gray-400"></i>
+              </div>
+              <div>
+                <p class="text-xs text-gray-500">邮箱</p>
+                <p class="text-gray-200">1344210009@qq.com</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="message-circle" class="w-4 h-4 text-gray-400"></i>
+              </div>
+              <div>
+                <p class="text-xs text-gray-500">微信</p>
+                <p class="text-gray-200">15218730823</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 作品集区（目录）==================== -->
+  <section id="portfolio" class="relative py-20 md:py-28">
+    <!-- 背景光效 -->
+    <div class="absolute inset-0 pointer-events-none overflow-hidden">
+      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-brand-purple/10 rounded-full blur-[120px]"></div>
+    </div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- 标题 -->
+      <div class="text-center mb-12 md:mb-16 fade-in-up">
+        <h2 class="text-4xl md:text-5xl lg:text-6xl font-black gradient-text mb-4">精选作品</h2>
+        <p class="text-gray-400 text-lg max-w-2xl mx-auto">每一个项目都是一次独特的创意旅程</p>
+      </div>
+
+      <!-- 筛选按钮 -->
+      <div class="portfolio-filters flex justify-center gap-3 mb-12 md:mb-16 flex-wrap fade-in-up">
+        <button class="filter-btn active" data-filter="all">全部</button>
+        <button class="filter-btn" data-filter="app">APP设计</button>
+        <button class="filter-btn" data-filter="website">网页设计</button>
+        <button class="filter-btn" data-filter="campus">校园项目</button>
+        <button class="filter-btn" data-filter="ops">运营设计</button>
+      </div>
+
+      <!-- 项目卡片网格 -->
+      <div class="portfolio-grid grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+
+        <!-- 项目1：AI斩书 APP -->
+        <div class="portfolio-card fade-in-up" data-category="app">
+          <a href="ai-zhanshu.html" class="block group">
+            <div class="portfolio-image rounded-2xl overflow-hidden relative">
+              <img src="assets/covers/AI斩书.png" alt="AI斩书 APP项目">
+              <div class="portfolio-overlay">
+                <div class="portfolio-overlay-text">
+                  <h4>查看详情</h4>
+                  <p>移动端应用设计</p>
+                </div>
+              </div>
+            </div>
+            <div class="portfolio-info pt-5">
+              <div class="portfolio-category">APP设计</div>
+              <h3 class="portfolio-title">"AI斩书" APP项目</h3>
+              <p class="portfolio-description">移动端应用设计，融合AI技术的阅读体验</p>
+            </div>
+          </a>
+        </div>
+
+        <!-- 项目2：未来慧学 网页端 -->
+        <div class="portfolio-card fade-in-up" data-category="website" style="animation-delay: 0.1s;">
+          <a href="file:///C:/Users/CWJ/WorkBuddy/20260504105628/%E6%9C%AA%E6%9D%A5%E6%85%A7%E5%AD%A6_%E4%BD%9C%E5%93%81%E9%9B%86%E4%BB%8B%E7%BB%8D%E9%A1%B5.html" class="block group">
+            <div class="portfolio-image rounded-2xl overflow-hidden relative">
+              <img src="assets/covers/未来慧学.png" alt="未来慧学网页端项目">
+              <div class="portfolio-overlay">
+                <div class="portfolio-overlay-text">
+                  <h4>查看详情</h4>
+                  <p>教育平台网页端</p>
+                </div>
+              </div>
+            </div>
+            <div class="portfolio-info pt-5">
+              <div class="portfolio-category">网页设计</div>
+              <h3 class="portfolio-title">"未来慧学" 网页端项目</h3>
+              <p class="portfolio-description">教育平台网页端设计，注重学习体验与交互</p>
+            </div>
+          </a>
+        </div>
+
+        <!-- 项目3：校园足球赛事 -->
+        <div class="portfolio-card fade-in-up" data-category="campus" style="animation-delay: 0.2s;">
+          <a href="goall.html" class="block group">
+            <div class="portfolio-image rounded-2xl overflow-hidden relative">
+              <img src="assets/covers/足球赛事.png" alt="校园足球赛事">
+              <div class="portfolio-overlay">
+                <div class="portfolio-overlay-text">
+                  <h4>查看详情</h4>
+                  <p>校园赛事管理系统</p>
+                </div>
+              </div>
+            </div>
+            <div class="portfolio-info pt-5">
+              <div class="portfolio-category">校园项目</div>
+              <h3 class="portfolio-title">校园项目足球赛事</h3>
+              <p class="portfolio-description">校园足球赛事管理系统设计，赛事信息展示与管理</p>
+            </div>
+          </a>
+        </div>
+
+        <!-- 项目4：AIGC助力运营 -->
+        <div class="portfolio-card fade-in-up" data-category="ops" style="animation-delay: 0.3s;">
+          <a href="aigc-ops.html" class="block group">
+            <div class="portfolio-image rounded-2xl overflow-hidden relative">
+              <img src="assets/covers/AIGC助力运营.png" alt="AIGC助力运营">
+              <div class="portfolio-overlay">
+                <div class="portfolio-overlay-text">
+                  <h4>查看详情</h4>
+                  <p>运营设计作品合集</p>
+                </div>
+              </div>
+            </div>
+            <div class="portfolio-info pt-5">
+              <div class="portfolio-category">运营设计</div>
+              <h3 class="portfolio-title">AIGC助力运营</h3>
+              <p class="portfolio-description">海报、H5、宣传物料、PPT等运营设计作品合集</p>
+            </div>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 页脚（联系我区）==================== -->
+  <footer id="contact" class="relative py-16 md:py-20 border-t border-white/5">
+    <!-- 背景光效 -->
+    <div class="absolute inset-0 pointer-events-none overflow-hidden">
+      <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-brand-purple/10 rounded-full blur-[100px]"></div>
+    </div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- 标题 -->
+      <div class="text-center mb-12 fade-in-up">
+        <h2 class="text-3xl md:text-4xl font-black gradient-text mb-3">联系我</h2>
+        <p class="text-gray-400">期待与你的合作</p>
+      </div>
+
+      <!-- 联系方式卡片 -->
+      <div class="max-w-2xl mx-auto fade-in-up">
+        <div class="glass-card rounded-2xl p-8 md:p-10">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <!-- 电话 -->
+            <div class="flex items-center gap-4 group">
+              <div class="w-12 h-12 rounded-xl bg-brand-purple/20 flex items-center justify-center flex-shrink-0 group-hover:bg-brand-purple/30 transition-colors">
+                <i data-lucide="phone" class="w-5 h-5 text-brand-purple"></i>
+              </div>
+              <div>
+                <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">电话</p>
+                <p class="text-white font-medium">15218730823</p>
+              </div>
+            </div>
+            <!-- 邮箱 -->
+            <div class="flex items-center gap-4 group">
+              <div class="w-12 h-12 rounded-xl bg-brand-pink/20 flex items-center justify-center flex-shrink-0 group-hover:bg-brand-pink/30 transition-colors">
+                <i data-lucide="mail" class="w-5 h-5 text-brand-pink"></i>
+              </div>
+              <div>
+                <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">邮箱</p>
+                <p class="text-white font-medium">1344210009@qq.com</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部版权 -->
+      <div class="text-center mt-12 pt-8 border-t border-white/5">
+        <p class="text-gray-500 text-sm">
+          &copy; 2026 蔡文杰. All rights reserved.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JS -->
+  <script src="js/main.js"></script>
+</body>
+</html>

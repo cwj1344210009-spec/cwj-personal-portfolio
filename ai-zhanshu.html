@@ -1,0 +1,1860 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI斩书 - 智能错题管理与学习辅助APP</title>
+  <meta name="description" content="AI斩书：面向中小学生的AI智能错题管理与学习辅助APP，融合拍照识题、AI辅导、智能组卷等核心功能。">
+
+  <!-- Tailwind CSS v3 CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide 图标库 -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+  <!-- Tailwind 自定义配置 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Noto Sans SC"', 'Inter', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            paper: {
+              50: '#eef6ff',
+              100: '#d9ebff',
+              200: '#bcd9ff',
+              300: '#8ec1ff',
+              400: '#59a0ff',
+              500: '#3480f2',
+              600: '#1a5fe0',
+              700: '#154bcb',
+              800: '#173da5',
+              900: '#193882',
+            },
+            dark: {
+              900: '#0a0a1a',
+              800: '#0f0a1a',
+              700: '#1a0a2e',
+            },
+            brand: {
+              purple: '#a855f7',
+              pink: '#ec4899',
+              blue: '#3b82f6',
+              violet: '#7c3aed',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* ==================== 基础样式 ==================== */
+    html { scroll-behavior: smooth; }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #f0f5ff; }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(to bottom, #3480f2, #59a0ff);
+      border-radius: 4px;
+    }
+
+    body {
+      background: #f0f5ff;
+      color: #1a2b4a;
+      overflow-x: hidden;
+    }
+
+    /* ==================== 导航栏 ==================== */
+    #navbar {
+      background: rgba(240, 245, 255, 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(52, 128, 242, 0.08);
+      transition: all 0.3s ease;
+    }
+    #navbar.scrolled {
+      background: rgba(240, 245, 255, 0.95);
+      box-shadow: 0 4px 30px rgba(52, 128, 242, 0.08);
+    }
+
+    /* ==================== 渐变文字 ==================== */
+    .gradient-text {
+      background: linear-gradient(135deg, #1a5fe0 0%, #3480f2 50%, #59a0ff 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradient-shift 4s ease infinite;
+    }
+
+    @keyframes gradient-shift {
+      0%, 100% { background-position: 0% center; }
+      50% { background-position: 100% center; }
+    }
+
+    /* ==================== 入场动画 ==================== */
+    .fade-in-up {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-in-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .fade-in-left {
+      opacity: 0;
+      transform: translateX(-40px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-in-left.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .fade-in-right {
+      opacity: 0;
+      transform: translateX(40px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-in-right.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* ==================== 手机模型 ==================== */
+    .phone-mockup {
+      position: relative;
+      width: 280px;
+      background: #fff;
+      border-radius: 36px;
+      padding: 12px;
+      box-shadow:
+        0 25px 60px rgba(52, 128, 242, 0.15),
+        0 8px 20px rgba(0, 0, 0, 0.08),
+        inset 0 0 0 2px rgba(52, 128, 242, 0.1);
+    }
+
+    .phone-screen {
+      border-radius: 26px;
+      overflow: hidden;
+      background: #f8faff;
+    }
+
+    .phone-screen img {
+      width: 100%;
+      display: block;
+      object-fit: contain;
+    }
+
+    /* 手机顶部刘海 */
+    .phone-notch {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 28px;
+      background: #000;
+      border-radius: 0 0 18px 18px;
+      z-index: 10;
+    }
+
+    /* ==================== 功能卡片 ==================== */
+    .feature-card {
+      background: #ffffff;
+      border-radius: 20px;
+      border: 1px solid rgba(52, 128, 242, 0.08);
+      box-shadow: 0 4px 20px rgba(52, 128, 242, 0.06);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+    }
+    .feature-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 50px rgba(52, 128, 242, 0.12);
+      border-color: rgba(52, 128, 242, 0.15);
+    }
+
+    .feature-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s ease;
+    }
+    .feature-card:hover .feature-icon {
+      transform: scale(1.1);
+    }
+
+    /* ==================== 流程步骤 ==================== */
+    .step-connector {
+      position: absolute;
+      top: 50%;
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, #3480f2, #59a0ff);
+      opacity: 0.3;
+    }
+
+    .step-number {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3480f2, #59a0ff);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 16px;
+      box-shadow: 0 4px 16px rgba(52, 128, 242, 0.3);
+    }
+
+    /* ==================== 背景光效 ==================== */
+    .bg-glow {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      pointer-events: none;
+    }
+
+    /* ==================== 导航链接 ==================== */
+    .nav-link {
+      position: relative;
+      color: #4a5568;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+    .nav-link:hover { color: #1a5fe0; }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #3480f2, #59a0ff);
+      transition: width 0.3s ease;
+    }
+    .nav-link:hover::after { width: 100%; }
+
+    /* ==================== 汉堡菜单 ==================== */
+    .menu-toggle span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: #1a2b4a;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+      transform-origin: center;
+    }
+    .menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+    .menu-toggle.active span:nth-child(2) { opacity: 0; }
+    .menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+    /* ==================== 返回按钮 ==================== */
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(52, 128, 242, 0.12);
+      border-radius: 12px;
+      color: #4a5568;
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+    .back-btn:hover {
+      background: #fff;
+      color: #1a5fe0;
+      border-color: rgba(52, 128, 242, 0.25);
+      box-shadow: 0 4px 16px rgba(52, 128, 242, 0.1);
+    }
+
+    /* ==================== Tab 切换 ==================== */
+    .tab-btn {
+      padding: 10px 24px;
+      border-radius: 9999px;
+      border: 1px solid rgba(52, 128, 242, 0.12);
+      background: #fff;
+      color: #64748b;
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .tab-btn:hover {
+      border-color: rgba(52, 128, 242, 0.3);
+      color: #1a5fe0;
+    }
+    .tab-btn.active {
+      background: linear-gradient(135deg, #3480f2, #59a0ff);
+      border-color: transparent;
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(52, 128, 242, 0.3);
+    }
+
+    /* ==================== Tab 内容 ==================== */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ==================== 响应式 ==================== */
+    @media (max-width: 768px) {
+      .phone-mockup { width: 220px; border-radius: 28px; padding: 8px; }
+      .phone-screen { border-radius: 20px; }
+      .phone-notch { width: 90px; height: 22px; top: 8px; }
+      .step-connector { width: 30px; }
+    }
+
+    /* ==================== 图标浮动动画 ==================== */
+    @keyframes icon-float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* ==================== 首页浮动图标容器 ==================== */
+    .hero-icon-box {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(52, 128, 242, 0.1);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(52, 128, 242, 0.08);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      animation: hero-icon-float 5s ease-in-out infinite;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      z-index: 5;
+    }
+    .hero-icon-box:hover {
+      transform: scale(1.15) !important;
+      box-shadow: 0 8px 24px rgba(52, 128, 242, 0.15);
+    }
+    .hero-icon-accent {
+      background: linear-gradient(135deg, rgba(52, 128, 242, 0.08), rgba(89, 160, 255, 0.12));
+      border-color: rgba(52, 128, 242, 0.15);
+    }
+    .hero-icon-sm {
+      border-radius: 10px;
+    }
+
+    @keyframes hero-icon-float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      25% { transform: translateY(-6px) rotate(1deg); }
+      50% { transform: translateY(-12px) rotate(0deg); }
+      75% { transform: translateY(-6px) rotate(-1deg); }
+    }
+
+    @media (max-width: 768px) {
+      .hero-icon-box {
+        transform: scale(0.75);
+      }
+      .hero-icon-box.hero-icon-sm {
+        transform: scale(0.65);
+      }
+    }
+
+    /* ==================== 模态框 ==================== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-content {
+      background: white;
+      border-radius: 24px;
+      max-width: 900px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      transform: scale(0.9) translateY(20px);
+      transition: transform 0.3s ease;
+      box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
+    }
+    .modal-overlay.active .modal-content {
+      transform: scale(1) translateY(0);
+    }
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.2s ease;
+      z-index: 10;
+    }
+    .modal-close:hover {
+      background: #fff;
+      transform: scale(1.1);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    /* 界面展示方块 */
+    .module-block {
+      background: #ffffff;
+      border-radius: 20px;
+      border: 1px solid rgba(52, 128, 242, 0.08);
+      box-shadow: 0 4px 20px rgba(52, 128, 242, 0.06);
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+      position: relative;
+    }
+    .module-block:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 50px rgba(52, 128, 242, 0.15);
+      border-color: rgba(52, 128, 242, 0.2);
+    }
+    .module-block::after {
+      content: '点击预览';
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: rgba(52, 128, 242, 0.9);
+      color: white;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      opacity: 0;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+    .module-block:hover::after {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ==================== 脉冲动画 ==================== */
+    .animate-pulse-slow {
+      animation: pulse-slow 4s ease-in-out infinite;
+    }
+    @keyframes pulse-slow {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.1); }
+    }
+
+    /* ==================== 亮点卡片 ==================== */
+    .highlight-card {
+      background: linear-gradient(135deg, rgba(52, 128, 242, 0.05), rgba(89, 160, 255, 0.08));
+      border: 1px solid rgba(52, 128, 242, 0.1);
+      border-radius: 16px;
+      padding: 24px;
+      transition: all 0.3s ease;
+    }
+    .highlight-card:hover {
+      background: linear-gradient(135deg, rgba(52, 128, 242, 0.08), rgba(89, 160, 255, 0.12));
+      border-color: rgba(52, 128, 242, 0.2);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(52, 128, 242, 0.1);
+    }
+
+    /* ==================== 分割线 ==================== */
+    .section-divider {
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, #3480f2, #59a0ff);
+      border-radius: 2px;
+      margin: 0 auto;
+    }
+
+    /* ==================== 设计情绪板 ==================== */
+    .mood-section {
+      background: linear-gradient(180deg, #f0f5ff 0%, #e8f0fe 50%, #f0f5ff 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .mood-section::before {
+      content: '';
+      position: absolute;
+      top: -200px;
+      right: -200px;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(52, 128, 242, 0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .mood-section::after {
+      content: '';
+      position: absolute;
+      bottom: -200px;
+      left: -200px;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(89, 160, 255, 0.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .mood-header {
+      text-align: center;
+      margin-bottom: 48px;
+      position: relative;
+    }
+    .mood-header .mood-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 20px;
+      background: linear-gradient(135deg, rgba(52, 128, 242, 0.08), rgba(89, 160, 255, 0.12));
+      border: 1px solid rgba(52, 128, 242, 0.12);
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #3480f2;
+      margin-bottom: 20px;
+    }
+    .mood-header h3 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #1a2b4a;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+    .mood-header p {
+      font-size: 16px;
+      color: #64748b;
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    .mood-card {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      background: #fff;
+      border: 1px solid rgba(52, 128, 242, 0.06);
+      box-shadow: 0 4px 24px rgba(52, 128, 242, 0.06);
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: default;
+    }
+    .mood-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 60px rgba(52, 128, 242, 0.12);
+      border-color: rgba(52, 128, 242, 0.12);
+    }
+
+    .mood-card-image {
+      position: relative;
+      aspect-ratio: 16 / 10;
+      overflow: hidden;
+    }
+    .mood-card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .mood-card:hover .mood-card-image img {
+      transform: scale(1.05);
+    }
+
+    .mood-card-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 40%, rgba(26, 43, 74, 0.85) 100%);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 24px;
+    }
+    .mood-card:hover .mood-card-overlay {
+      opacity: 1;
+    }
+    .mood-card-overlay h4 {
+      color: #fff;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      transform: translateY(10px);
+      transition: transform 0.5s ease 0.1s;
+    }
+    .mood-card:hover .mood-card-overlay h4 {
+      transform: translateY(0);
+    }
+    .mood-card-overlay p {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 13px;
+      line-height: 1.6;
+      transform: translateY(10px);
+      transition: transform 0.5s ease 0.15s;
+    }
+    .mood-card:hover .mood-card-overlay p {
+      transform: translateY(0);
+    }
+
+    .mood-card-accent {
+      height: 4px;
+      width: 100%;
+      transition: height 0.3s ease;
+    }
+    .mood-card:hover .mood-card-accent {
+      height: 5px;
+    }
+    .mood-accent-minimal {
+      background: linear-gradient(90deg, #bcd9ff, #8ec1ff);
+    }
+    .mood-accent-warm {
+      background: linear-gradient(90deg, #fbbf24, #f59e0b);
+    }
+    .mood-accent-learn {
+      background: linear-gradient(90deg, #3480f2, #59a0ff);
+    }
+
+    .mood-card-body {
+      padding: 20px 24px 24px;
+    }
+    .mood-card-body .mood-card-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1a2b4a;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .mood-card-body .mood-card-title .mood-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .mood-card-body .mood-card-desc {
+      font-size: 13px;
+      color: #64748b;
+      line-height: 1.7;
+      margin-bottom: 14px;
+    }
+    .mood-card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .mood-tag {
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+    .mood-tag-minimal {
+      background: rgba(52, 128, 242, 0.06);
+      color: #3480f2;
+      border: 1px solid rgba(52, 128, 242, 0.1);
+    }
+    .mood-tag-warm {
+      background: rgba(245, 158, 11, 0.06);
+      color: #d97706;
+      border: 1px solid rgba(245, 158, 11, 0.12);
+    }
+    .mood-tag-learn {
+      background: rgba(52, 128, 242, 0.06);
+      color: #1a5fe0;
+      border: 1px solid rgba(52, 128, 242, 0.1);
+    }
+
+    /* 情绪板响应式 */
+    @media (max-width: 768px) {
+      .mood-card-overlay {
+        opacity: 1;
+        background: linear-gradient(180deg, transparent 50%, rgba(26, 43, 74, 0.7) 100%);
+      }
+      .mood-card-overlay h4,
+      .mood-card-overlay p {
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body class="font-sans">
+
+  <!-- ==================== 顶部导航栏 ==================== -->
+  <nav id="navbar" class="fixed top-0 left-0 right-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 md:h-20">
+        <!-- Logo -->
+        <a href="index.html" class="flex items-center gap-3 group">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-paper-500 to-paper-400 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-paper-500/30 group-hover:shadow-paper-500/50 transition-shadow">
+            <i data-lucide="book-open" class="w-5 h-5"></i>
+          </div>
+          <span class="hidden sm:block text-sm md:text-base font-semibold tracking-wide text-gray-700">
+            AI<span class="text-paper-600">斩书</span>
+          </span>
+        </a>
+
+        <!-- 桌面端导航链接 -->
+        <div class="hidden md:flex items-center gap-8">
+          <a href="#overview" class="nav-link text-sm">项目概述</a>
+          <a href="#features" class="nav-link text-sm">功能详情</a>
+          <a href="#demo" class="nav-link text-sm">界面展示</a>
+          <a href="#guide" class="nav-link text-sm">使用指南</a>
+          <a href="#value" class="nav-link text-sm">项目成果</a>
+        </div>
+
+        <!-- 返回按钮 -->
+        <a href="index.html" class="back-btn">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          <span class="hidden sm:inline">返回作品集</span>
+        </a>
+
+        <!-- 移动端汉堡菜单 -->
+        <button id="menuToggle" class="md:hidden menu-toggle flex flex-col gap-1.5 p-2" aria-label="打开菜单">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 移动端下拉菜单 -->
+    <div id="mobileMenu" class="md:hidden hidden">
+      <div class="mx-4 mt-2 bg-white rounded-2xl p-6 flex flex-col gap-4 shadow-xl border border-paper-100">
+        <a href="#overview" class="mobile-nav-link text-base font-medium text-gray-600 hover:text-paper-600 transition-colors py-2">项目概述</a>
+        <a href="#features" class="mobile-nav-link text-base font-medium text-gray-600 hover:text-paper-600 transition-colors py-2">功能详情</a>
+        <a href="#demo" class="mobile-nav-link text-base font-medium text-gray-600 hover:text-paper-600 transition-colors py-2">界面展示</a>
+        <a href="#guide" class="mobile-nav-link text-base font-medium text-gray-600 hover:text-paper-600 transition-colors py-2">使用指南</a>
+        <a href="#value" class="mobile-nav-link text-base font-medium text-gray-600 hover:text-paper-600 transition-colors py-2">项目成果</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ==================== 英雄区 ==================== -->
+  <section id="hero" class="relative min-h-screen flex items-center overflow-hidden pt-20">
+    <!-- 背景光效 -->
+    <div class="absolute inset-0 pointer-events-none">
+      <div class="bg-glow w-[500px] h-[500px] top-1/4 left-1/4 bg-paper-300/30 animate-pulse-slow"></div>
+      <div class="bg-glow w-[400px] h-[400px] bottom-1/4 right-1/4 bg-paper-200/40 animate-pulse-slow" style="animation-delay: 1s;"></div>
+      <div class="bg-glow w-[300px] h-[300px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-paper-100/50"></div>
+    </div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+
+        <!-- 左侧文字 -->
+        <div class="flex-1 text-center lg:text-left fade-in-up">
+          <div class="inline-flex items-center gap-2 px-4 py-2 bg-paper-50 border border-paper-200 rounded-full mb-6">
+            <span class="w-2 h-2 bg-paper-500 rounded-full animate-pulse"></span>
+            <span class="text-sm font-medium text-paper-700">AI 驱动的智能学习平台</span>
+          </div>
+
+          <h1 class="text-5xl sm:text-6xl md:text-7xl font-black mb-4 leading-tight">
+            <span class="gradient-text">AI 斩书</span>
+          </h1>
+          <p class="text-lg sm:text-xl text-gray-500 mb-6 max-w-xl mx-auto lg:mx-0">
+            面向中小学生的 AI 智能错题管理与学习辅助 APP
+          </p>
+          <p class="text-base text-gray-400 mb-10 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+            融合拍照识题、AI 深度解析、错题智能归档、精准组卷巩固的一站式学习闭环，为中小学生构建极简、高效、贴合日常学习场景的智能学习平台。
+          </p>
+
+          <!-- 标签 -->
+          <div class="flex flex-wrap gap-3 justify-center lg:justify-start mb-10">
+            <span class="px-4 py-2 bg-paper-50 border border-paper-200 rounded-xl text-sm font-medium text-paper-700">拍照识题</span>
+            <span class="px-4 py-2 bg-paper-50 border border-paper-200 rounded-xl text-sm font-medium text-paper-700">AI 辅导</span>
+            <span class="px-4 py-2 bg-paper-50 border border-paper-200 rounded-xl text-sm font-medium text-paper-700">错题管理</span>
+            <span class="px-4 py-2 bg-paper-50 border border-paper-200 rounded-xl text-sm font-medium text-paper-700">智能组卷</span>
+          </div>
+
+          <!-- 按钮 -->
+          <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+            <a href="#features" class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-paper-600 to-paper-400 text-white font-semibold rounded-2xl shadow-lg shadow-paper-500/30 hover:shadow-paper-500/50 hover:scale-105 transition-all duration-300 group">
+              了解功能详情
+              <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+            </a>
+            <a href="#demo" class="inline-flex items-center justify-center gap-2 px-8 py-4 border border-paper-200 text-paper-700 font-semibold rounded-2xl hover:bg-paper-50 hover:scale-105 transition-all duration-300">
+              查看界面展示
+            </a>
+          </div>
+        </div>
+
+        <!-- 右侧手机模型 -->
+        <div class="flex-1 flex items-center justify-center fade-in-up" style="animation-delay: 0.2s;">
+          <div class="relative w-[420px] h-[520px]">
+            <!-- 装饰圆环 -->
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] h-[340px] rounded-full border border-paper-200/30"></div>
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full border border-paper-100/20"></div>
+
+            <!-- 手机主体 -->
+            <div class="phone-mockup absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+              <div class="phone-notch"></div>
+              <div class="phone-screen">
+                <img src="assets/ai-zhanshu/wrongbook/首页.png" alt="AI斩书首页">
+              </div>
+            </div>
+
+            <!-- ===== 随机分布的正方形图标容器 ===== -->
+            <!-- 右上区域 -->
+            <div class="hero-icon-box" style="position:absolute; top:8%; right:0%; width:56px; height:56px; animation-delay:0s;">
+              <i data-lucide="scan" class="w-6 h-6 text-paper-500"></i>
+            </div>
+            <div class="hero-icon-box" style="position:absolute; top:2%; right:18%; width:44px; height:44px; animation-delay:0.4s;">
+              <i data-lucide="camera" class="w-5 h-5 text-paper-400"></i>
+            </div>
+            <div class="hero-icon-box hero-icon-accent" style="position:absolute; top:16%; right:-4%; width:48px; height:48px; animation-delay:0.8s;">
+              <i data-lucide="book-open" class="w-5 h-5 text-paper-600"></i>
+            </div>
+
+            <!-- 右侧中部 -->
+            <div class="hero-icon-box" style="position:absolute; top:38%; right:-6%; width:52px; height:52px; animation-delay:1.2s;">
+              <i data-lucide="brain" class="w-6 h-6 text-paper-500"></i>
+            </div>
+            <div class="hero-icon-box hero-icon-sm" style="position:absolute; top:48%; right:2%; width:36px; height:36px; animation-delay:1.6s;">
+              <i data-lucide="target" class="w-4 h-4 text-paper-400"></i>
+            </div>
+
+            <!-- 右下区域 -->
+            <div class="hero-icon-box" style="position:absolute; bottom:18%; right:-2%; width:50px; height:50px; animation-delay:2.0s;">
+              <i data-lucide="file-stack" class="w-5 h-5 text-paper-500"></i>
+            </div>
+            <div class="hero-icon-box hero-icon-sm" style="position:absolute; bottom:8%; right:12%; width:38px; height:38px; animation-delay:0.2s;">
+              <i data-lucide="layers" class="w-4 h-4 text-paper-400"></i>
+            </div>
+
+            <!-- 左上区域 -->
+            <div class="hero-icon-box" style="position:absolute; top:4%; left:0%; width:50px; height:50px; animation-delay:0.6s;">
+              <i data-lucide="zap" class="w-5 h-5 text-paper-500"></i>
+            </div>
+            <div class="hero-icon-box hero-icon-sm" style="position:absolute; top:14%; left:8%; width:36px; height:36px; animation-delay:1.0s;">
+              <i data-lucide="sparkles" class="w-4 h-4 text-paper-400"></i>
+            </div>
+
+            <!-- 左侧中部 -->
+            <div class="hero-icon-box hero-icon-accent" style="position:absolute; top:36%; left:-6%; width:54px; height:54px; animation-delay:1.4s;">
+              <i data-lucide="lightbulb" class="w-6 h-6 text-paper-600"></i>
+            </div>
+            <div class="hero-icon-box hero-icon-sm" style="position:absolute; top:50%; left:0%; width:38px; height:38px; animation-delay:1.8s;">
+              <i data-lucide="bar-chart-3" class="w-4 h-4 text-paper-400"></i>
+            </div>
+
+            <!-- 左下区域 -->
+            <div class="hero-icon-box" style="position:absolute; bottom:22%; left:-4%; width:48px; height:48px; animation-delay:2.2s;">
+              <i data-lucide="graduation-cap" class="w-5 h-5 text-paper-500"></i>
+            </div>
+            <div class="hero-icon-box hero-icon-sm" style="position:absolute; bottom:10%; left:8%; width:40px; height:40px; animation-delay:0.3s;">
+              <i data-lucide="pencil-ruler" class="w-4 h-4 text-paper-400"></i>
+            </div>
+
+            <!-- 顶部居中偏右 -->
+            <div class="hero-icon-box hero-icon-sm" style="position:absolute; top:-2%; left:55%; width:38px; height:38px; animation-delay:0.5s;">
+              <i data-lucide="bookmark" class="w-4 h-4 text-paper-400"></i>
+            </div>
+
+            <!-- 底部居中偏左 -->
+            <div class="hero-icon-box" style="position:absolute; bottom:-2%; left:30%; width:44px; height:44px; animation-delay:1.9s;">
+              <i data-lucide="repeat" class="w-5 h-5 text-paper-500"></i>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 项目概述 ==================== -->
+  <section id="overview" class="relative py-20 md:py-28">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- 标题 -->
+      <div class="text-center mb-16 fade-in-up">
+        <h2 class="text-3xl md:text-4xl font-black text-gray-800 mb-4">项目概述</h2>
+        <div class="section-divider mb-6"></div>
+        <p class="text-gray-500 text-lg max-w-2xl mx-auto">
+          AI 斩书 —— 用 AI 技术重新定义错题管理，让学习更高效
+        </p>
+      </div>
+
+      <!-- 概述卡片 -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+        <!-- 左：设计理念 -->
+        <div class="feature-card p-8 fade-in-left">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="feature-icon bg-paper-50">
+              <i data-lucide="lightbulb" class="w-7 h-7 text-paper-500"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800">设计理念</h3>
+          </div>
+          <p class="text-gray-500 leading-relaxed mb-4">
+            "AI 斩书" 是一款面向小学至初中学生的 AI 智能学习辅助 APP，聚焦中小学生错题管理与高效学习的核心需求。
+          </p>
+          <p class="text-gray-500 leading-relaxed">
+            直击传统搜题类 APP 错题整理繁琐、解析缺乏深度、功能冗余干扰、家长监管缺失等痛点，打造拍照收题 → AI 深度解析 → 错题智能归档 → 精准组卷巩固的一站式学习闭环。
+          </p>
+        </div>
+
+        <!-- 右：目标用户 -->
+        <div class="feature-card p-8 fade-in-right">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="feature-icon bg-paper-50">
+              <i data-lucide="users" class="w-7 h-7 text-paper-500"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800">目标用户</h3>
+          </div>
+          <div class="space-y-4">
+            <div class="flex items-start gap-4 p-4 bg-paper-50/50 rounded-xl">
+              <div class="w-10 h-10 rounded-lg bg-paper-100 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="graduation-cap" class="w-5 h-5 text-paper-600"></i>
+              </div>
+              <div>
+                <p class="font-semibold text-gray-700">中小学生</p>
+                <p class="text-sm text-gray-500">小学至初中学生，需要高效管理错题、提升学习效率</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4 p-4 bg-paper-50/50 rounded-xl">
+              <div class="w-10 h-10 rounded-lg bg-paper-100 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="heart" class="w-5 h-5 text-paper-600"></i>
+              </div>
+              <div>
+                <p class="font-semibold text-gray-700">家长</p>
+                <p class="text-sm text-gray-500">关注孩子学习进度，希望通过数据了解孩子薄弱环节</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4 p-4 bg-paper-50/50 rounded-xl">
+              <div class="w-10 h-10 rounded-lg bg-paper-100 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="book-open" class="w-5 h-5 text-paper-600"></i>
+              </div>
+              <div>
+                <p class="font-semibold text-gray-700">教师</p>
+                <p class="text-sm text-gray-500">辅助教学，快速组卷，精准了解学生薄弱知识点</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 设计情绪板 -->
+      <div class="mood-section rounded-3xl p-8 md:p-12 lg:p-16 fade-in-up">
+        <!-- 头部 -->
+        <div class="mood-header">
+          <div class="mood-badge">
+            <i data-lucide="palette" class="w-4 h-4"></i>
+            <span>Design Mood Board</span>
+          </div>
+          <h3>设计情绪板</h3>
+          <p>三种视觉风格方向，定义产品的设计语言与情感基调</p>
+        </div>
+
+        <!-- 三张情绪板卡片 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+
+          <!-- 极简 -->
+          <div class="mood-card fade-in-up">
+            <div class="mood-card-accent mood-accent-minimal"></div>
+            <div class="mood-card-image">
+              <img src="assets/ai-zhanshu/mood-极简.png" alt="极简">
+              <div class="mood-card-overlay">
+                <h4>极简</h4>
+                <p>克制用色，留白呼吸，让信息层次自然浮现</p>
+              </div>
+            </div>
+            <div class="mood-card-body">
+              <div class="mood-card-title">
+                <span class="mood-icon bg-paper-100">
+                  <i data-lucide="minus" class="w-4 h-4 text-paper-600"></i>
+                </span>
+                极简设计
+              </div>
+              <p class="mood-card-desc">
+                以干净的线条与充足留白为核心，摒弃冗余装饰。色彩克制、排版通透，让用户专注于内容本身，营造高效清爽的学习氛围。
+              </p>
+              <div class="mood-card-tags">
+                <span class="mood-tag mood-tag-minimal">留白</span>
+                <span class="mood-tag mood-tag-minimal">克制用色</span>
+                <span class="mood-tag mood-tag-minimal">信息优先</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 温馨 -->
+          <div class="mood-card fade-in-up" style="animation-delay: 0.1s;">
+            <div class="mood-card-accent mood-accent-warm"></div>
+            <div class="mood-card-image">
+              <img src="assets/ai-zhanshu/mood-温馨.png" alt="温馨">
+              <div class="mood-card-overlay">
+                <h4>温馨</h4>
+                <p>暖色点缀，柔和过渡，传递关怀与陪伴感</p>
+              </div>
+            </div>
+            <div class="mood-card-body">
+              <div class="mood-card-title">
+                <span class="mood-icon" style="background: rgba(245, 158, 11, 0.1);">
+                  <i data-lucide="sun" class="w-4 h-4 text-amber-500"></i>
+                </span>
+                温馨风格
+              </div>
+              <p class="mood-card-desc">
+                运用暖色调与圆润造型，营造亲切友好的界面感受。柔和的色彩过渡与细腻的微交互，让学生在使用中感受到关怀与鼓励。
+              </p>
+              <div class="mood-card-tags">
+                <span class="mood-tag mood-tag-warm">暖色调</span>
+                <span class="mood-tag mood-tag-warm">圆润造型</span>
+                <span class="mood-tag mood-tag-warm">情感化</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 学习 -->
+          <div class="mood-card fade-in-up" style="animation-delay: 0.2s;">
+            <div class="mood-card-accent mood-accent-learn"></div>
+            <div class="mood-card-image">
+              <img src="assets/ai-zhanshu/mood-学习.png" alt="学习">
+              <div class="mood-card-overlay">
+                <h4>学习</h4>
+                <p>理性蓝调，知识氛围，激发专注与探索欲</p>
+              </div>
+            </div>
+            <div class="mood-card-body">
+              <div class="mood-card-title">
+                <span class="mood-icon bg-paper-100">
+                  <i data-lucide="graduation-cap" class="w-4 h-4 text-paper-600"></i>
+                </span>
+                学习氛围
+              </div>
+              <p class="mood-card-desc">
+                以蓝色系为主调，传递理性与专注。清晰的视觉层次与结构化布局，帮助学生沉浸于学习场景，提升知识吸收效率。
+              </p>
+              <div class="mood-card-tags">
+                <span class="mood-tag mood-tag-learn">理性蓝</span>
+                <span class="mood-tag mood-tag-learn">结构化</span>
+                <span class="mood-tag mood-tag-learn">专注力</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 功能详情 ==================== -->
+  <section id="features" class="relative py-20 md:py-28 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- 标题 -->
+      <div class="text-center mb-16 fade-in-up">
+        <h2 class="text-3xl md:text-4xl font-black text-gray-800 mb-4">功能详情</h2>
+        <div class="section-divider mb-6"></div>
+        <p class="text-gray-500 text-lg max-w-2xl mx-auto">
+          四大核心模块，构建完整的学习闭环
+        </p>
+      </div>
+
+      <!-- 功能 Tab 切换 -->
+      <div class="flex justify-center gap-3 mb-12 flex-wrap fade-in-up">
+        <button class="tab-btn active" data-tab="wrongbook">错题本</button>
+        <button class="tab-btn" data-tab="photo">拍照识题</button>
+        <button class="tab-btn" data-tab="paper">组卷</button>
+        <button class="tab-btn" data-tab="personal">个人中心</button>
+      </div>
+
+      <!-- ==================== 错题本 Tab ==================== -->
+      <div id="tab-wrongbook" class="tab-content active">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <!-- 左：手机模型 -->
+          <div class="flex justify-center fade-in-left">
+            <div class="phone-mockup">
+              <div class="phone-notch"></div>
+              <div class="phone-screen">
+                <img src="assets/ai-zhanshu/wrongbook/错题本.png" alt="错题本界面">
+              </div>
+            </div>
+          </div>
+
+          <!-- 右：功能说明 -->
+          <div class="fade-in-right">
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-paper-50 border border-paper-200 rounded-full mb-4">
+              <i data-lucide="book-marked" class="w-4 h-4 text-paper-500"></i>
+              <span class="text-sm font-medium text-paper-700">核心模块</span>
+            </div>
+            <h3 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4">错题本</h3>
+            <p class="text-gray-500 leading-relaxed mb-8">
+              错题本是用户管理错题与复习巩固的核心区域。支持按科目、年级、时间进行筛选，快速定位目标错题。每道题目提供三大核心功能入口。
+            </p>
+
+            <!-- 三大子功能 -->
+            <div class="space-y-6">
+              <!-- 题目解析 -->
+              <div class="highlight-card">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="w-10 h-10 rounded-xl bg-paper-100 flex items-center justify-center">
+                    <i data-lucide="file-text" class="w-5 h-5 text-paper-600"></i>
+                  </div>
+                  <h4 class="font-bold text-gray-800">题目解析</h4>
+                </div>
+                <p class="text-sm text-gray-500 leading-relaxed">
+                  点击"解析"按钮，AI 自动分析题目并给出详细解题步骤、答案及考察知识点。帮助学生理解解题思路，掌握核心概念，而非简单对答案。
+                </p>
+                <div class="flex gap-2 mt-3">
+                  <img src="assets/ai-zhanshu/wrongbook/解析.png" alt="解析界面" class="w-20 h-36 object-contain rounded-lg border border-paper-100 bg-paper-50/50">
+                  <img src="assets/ai-zhanshu/wrongbook/首页.png" alt="首页" class="w-20 h-36 object-contain rounded-lg border border-paper-100 bg-paper-50/50">
+                </div>
+              </div>
+
+              <!-- AI 辅导 -->
+              <div class="highlight-card">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="w-10 h-10 rounded-xl bg-paper-100 flex items-center justify-center">
+                    <i data-lucide="bot" class="w-5 h-5 text-paper-600"></i>
+                  </div>
+                  <h4 class="font-bold text-gray-800">AI 辅导</h4>
+                </div>
+                <p class="text-sm text-gray-500 leading-relaxed">
+                  点击"辅导"进入 AI 对话界面，可以针对错题进行深度追问。AI 会根据题目内容进行个性化辅导，解答疑问，帮助学生真正理解知识点。
+                </p>
+                <div class="flex gap-2 mt-3">
+                  <img src="assets/ai-zhanshu/wrongbook/AI辅导.png" alt="AI辅导" class="w-20 h-36 object-contain rounded-lg border border-paper-100 bg-paper-50/50">
+                  <img src="assets/ai-zhanshu/wrongbook/AI辅导弹窗.png" alt="AI辅导弹窗" class="w-20 h-36 object-contain rounded-lg border border-paper-100 bg-paper-50/50">
+                </div>
+              </div>
+
+              <!-- 相似题推荐 -->
+              <div class="highlight-card">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="w-10 h-10 rounded-xl bg-paper-100 flex items-center justify-center">
+                    <i data-lucide="layers" class="w-5 h-5 text-paper-600"></i>
+                  </div>
+                  <h4 class="font-bold text-gray-800">相似题推荐</h4>
+                </div>
+                <p class="text-sm text-gray-500 leading-relaxed">
+                  点击"相似题"，AI 智能推荐与当前错题知识点相似的练习题目，帮助学生举一反三，巩固薄弱环节，避免同类错误再次发生。
+                </p>
+                <div class="flex gap-2 mt-3">
+                  <img src="assets/ai-zhanshu/wrongbook/相似题.png" alt="相似题" class="w-20 h-36 object-contain rounded-lg border border-paper-100 bg-paper-50/50">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== 拍照识题 Tab ==================== -->
+      <div id="tab-photo" class="tab-content">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <!-- 左：手机模型 -->
+          <div class="flex justify-center fade-in-left">
+            <div class="phone-mockup">
+              <div class="phone-notch"></div>
+              <div class="phone-screen">
+                <img src="assets/ai-zhanshu/photo/相机.png" alt="拍照识题界面">
+              </div>
+            </div>
+          </div>
+
+          <!-- 右：功能说明 -->
+          <div class="fade-in-right">
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-paper-50 border border-paper-200 rounded-full mb-4">
+              <i data-lucide="camera" class="w-4 h-4 text-paper-500"></i>
+              <span class="text-sm font-medium text-paper-700">拍照识题</span>
+            </div>
+            <h3 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4">拍照识题</h3>
+            <p class="text-gray-500 leading-relaxed mb-8">
+              一键拍照，智能识别试卷、练习册上的错题。支持多题同时识别，自动拆分并归类到错题本中，省去手动抄题的繁琐过程。
+            </p>
+
+            <!-- 拍照流程 -->
+            <div class="space-y-6">
+              <div class="highlight-card">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="step-number">1</div>
+                  <h4 class="font-bold text-gray-800">拍照采集</h4>
+                </div>
+                <p class="text-sm text-gray-500 leading-relaxed">
+                  打开相机，对准试卷或练习册进行拍照。支持批量拍照，自动识别页面中的所有题目。
+                </p>
+                <div class="flex gap-2 mt-3">
+                  <img src="assets/ai-zhanshu/photo/相机.png" alt="拍照" class="w-20 h-36 object-contain rounded-lg border border-paper-100 bg-paper-50/50">
+                </div>
+              </div>
+
+              <div class="highlight-card">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="step-number">2</div>
+                  <h4 class="font-bold text-gray-800">智能识别</h4>
+                </div>
+                <p class="text-sm text-gray-500 leading-relaxed">
+                  AI 自动识别图片中的题目，进行 OCR 文字提取和题目拆分，支持多题同时识别，精准定位每一道题目。
+                </p>
+                <div class="flex gap-2 mt-3">
+                  <img src="assets/ai-zhanshu/photo/识别题目.png" alt="识别" class="w-20 h-36 object-contain rounded-lg border border-paper-100 bg-paper-50/50">
+                  <img src="assets/ai-zhanshu/photo/选中题目.png" alt="选中" class="w-20 h-36 object-contain rounded-lg border border-paper-100 bg-paper-50/50">
+                </div>
+              </div>
+
+              <div class="highlight-card">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="step-number">3</div>
+                  <h4 class="font-bold text-gray-800">加入错题本</h4>
+                </div>
+                <p class="text-sm text-gray-500 leading-relaxed">
+                  选择需要保存的题目，选择科目和年级，一键加入错题本。支持手动校验和重新识别，确保题目准确性。
+                </p>
+                <div class="flex gap-2 mt-3">
+                  <img src="assets/ai-zhanshu/photo/加入错题本确认.png" alt="加入错题本" class="w-20 h-36 object-contain rounded-lg border border-paper-100 bg-paper-50/50">
+                  <img src="assets/ai-zhanshu/photo/选择科目.png" alt="选择科目" class="w-20 h-36 object-contain rounded-lg border border-paper-100 bg-paper-50/50">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== 组卷 Tab ==================== -->
+      <div id="tab-paper" class="tab-content">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <!-- 左：手机模型 -->
+          <div class="flex justify-center fade-in-left">
+            <div class="phone-mockup">
+              <div class="phone-notch"></div>
+              <div class="phone-screen">
+                <img src="assets/ai-zhanshu/paper/组卷.png" alt="组卷界面">
+              </div>
+            </div>
+          </div>
+
+          <!-- 右：功能说明 -->
+          <div class="fade-in-right">
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-paper-50 border border-paper-200 rounded-full mb-4">
+              <i data-lucide="file-stack" class="w-4 h-4 text-paper-500"></i>
+              <span class="text-sm font-medium text-paper-700">智能组卷</span>
+            </div>
+            <h3 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4">组成试卷</h3>
+            <p class="text-gray-500 leading-relaxed mb-8">
+              从错题本中精选题目，按科目、年级、掌握程度等维度筛选，快速组成个性化试卷，支持预览和导出打印。
+            </p>
+
+            <!-- 组卷流程 -->
+            <div class="space-y-6">
+              <div class="highlight-card">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="step-number">1</div>
+                  <h4 class="font-bold text-gray-800">筛选题目</h4>
+                </div>
+                <p class="text-sm text-gray-500 leading-relaxed">
+                  支持按科目、来源、掌握程度、收集时间、年级等多维度筛选错题，精准定位需要巩固的薄弱环节。
+                </p>
+                <div class="flex gap-2 mt-3">
+                  <img src="assets/ai-zhanshu/paper/筛选.png" alt="筛选" class="w-20 h-36 object-contain rounded-lg border border-paper-100 bg-paper-50/50">
+                  <img src="assets/ai-zhanshu/paper/组卷.png" alt="组卷" class="w-20 h-36 object-contain rounded-lg border border-paper-100 bg-paper-50/50">
+                </div>
+              </div>
+
+              <div class="highlight-card">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="step-number">2</div>
+                  <h4 class="font-bold text-gray-800">预览试卷</h4>
+                </div>
+                <p class="text-sm text-gray-500 leading-relaxed">
+                  组卷完成后可预览试卷全貌，确认题目顺序和内容。支持删除不需要的题目，灵活调整试卷结构。
+                </p>
+                <div class="flex gap-2 mt-3">
+                  <img src="assets/ai-zhanshu/paper/组卷预览.png" alt="预览" class="w-20 h-36 object-contain rounded-lg border border-paper-100 bg-paper-50/50">
+                  <img src="assets/ai-zhanshu/paper/删除题目确认.png" alt="删除确认" class="w-20 h-36 object-contain rounded-lg border border-paper-100 bg-paper-50/50">
+                </div>
+              </div>
+
+              <div class="highlight-card">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="step-number">3</div>
+                  <h4 class="font-bold text-gray-800">导出打印</h4>
+                </div>
+                <p class="text-sm text-gray-500 leading-relaxed">
+                  确认无误后一键导出试卷，支持打印成纸质版进行线下练习，实现线上错题管理与线下巩固的无缝衔接。
+                </p>
+                <div class="flex gap-2 mt-3">
+                  <img src="assets/ai-zhanshu/paper/确认导出.png" alt="导出" class="w-20 h-36 object-contain rounded-lg border border-paper-100 bg-paper-50/50">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== 个人中心 Tab ==================== -->
+      <div id="tab-personal" class="tab-content">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <!-- 左：手机模型 -->
+          <div class="flex justify-center fade-in-left">
+            <div class="phone-mockup">
+              <div class="phone-notch"></div>
+              <div class="phone-screen">
+                <img src="assets/ai-zhanshu/个人中心.png" alt="个人中心">
+              </div>
+            </div>
+          </div>
+
+          <!-- 右：功能说明 -->
+          <div class="fade-in-right">
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-paper-50 border border-paper-200 rounded-full mb-4">
+              <i data-lucide="user" class="w-4 h-4 text-paper-500"></i>
+              <span class="text-sm font-medium text-paper-700">个人中心</span>
+            </div>
+            <h3 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4">个人中心</h3>
+            <p class="text-gray-500 leading-relaxed mb-8">
+              管理个人信息、查看学习数据统计、切换年级和科目偏好，全面掌控学习进度。
+            </p>
+
+            <div class="space-y-4">
+              <div class="highlight-card">
+                <div class="flex items-center gap-3 mb-2">
+                  <i data-lucide="bar-chart-3" class="w-5 h-5 text-paper-500"></i>
+                  <h4 class="font-bold text-gray-800">学习数据统计</h4>
+                </div>
+                <p class="text-sm text-gray-500">查看错题数量、已掌握比例、学习时长等数据，直观了解学习进度。</p>
+              </div>
+
+              <div class="highlight-card">
+                <div class="flex items-center gap-3 mb-2">
+                  <i data-lucide="settings" class="w-5 h-5 text-paper-500"></i>
+                  <h4 class="font-bold text-gray-800">偏好设置</h4>
+                </div>
+                <p class="text-sm text-gray-500">切换年级、科目偏好，个性化定制学习体验。</p>
+              </div>
+
+              <div class="highlight-card">
+                <div class="flex items-center gap-3 mb-2">
+                  <i data-lucide="bookmark" class="w-5 h-5 text-paper-500"></i>
+                  <h4 class="font-bold text-gray-800">收藏与历史</h4>
+                </div>
+                <p class="text-sm text-gray-500">管理收藏的题目、查看学习历史记录，方便回顾与复习。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 界面展示 ==================== -->
+  <section id="demo" class="relative py-20 md:py-28">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- 标题 -->
+      <div class="text-center mb-16 fade-in-up">
+        <h2 class="text-3xl md:text-4xl font-black text-gray-800 mb-4">界面展示</h2>
+        <div class="section-divider mb-6"></div>
+        <p class="text-gray-500 text-lg max-w-2xl mx-auto">
+          点击模块方块，查看完整界面预览
+        </p>
+      </div>
+
+      <!-- 模块方块网格 -->
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+
+        <!-- 引导页 -->
+        <div class="module-block p-6 text-center fade-in-up" onclick="openModal('flow')">
+          <div class="w-14 h-14 rounded-2xl bg-paper-100 flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="sparkles" class="w-7 h-7 text-paper-500"></i>
+          </div>
+          <h4 class="font-bold text-gray-800 mb-1">引导页</h4>
+          <p class="text-xs text-gray-400">4 张界面</p>
+        </div>
+
+        <!-- 首页 -->
+        <div class="module-block p-6 text-center fade-in-up" style="animation-delay: 0.05s;" onclick="openModal('home')">
+          <div class="w-14 h-14 rounded-2xl bg-paper-100 flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="home" class="w-7 h-7 text-paper-500"></i>
+          </div>
+          <h4 class="font-bold text-gray-800 mb-1">首页</h4>
+          <p class="text-xs text-gray-400">功能入口</p>
+        </div>
+
+        <!-- 错题本 -->
+        <div class="module-block p-6 text-center fade-in-up" style="animation-delay: 0.1s;" onclick="openModal('wrongbook')">
+          <div class="w-14 h-14 rounded-2xl bg-paper-100 flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="book-marked" class="w-7 h-7 text-paper-500"></i>
+          </div>
+          <h4 class="font-bold text-gray-800 mb-1">错题本</h4>
+          <p class="text-xs text-gray-400">错题管理</p>
+        </div>
+
+        <!-- 题目解析 -->
+        <div class="module-block p-6 text-center fade-in-up" style="animation-delay: 0.15s;" onclick="openModal('analysis')">
+          <div class="w-14 h-14 rounded-2xl bg-paper-100 flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="file-text" class="w-7 h-7 text-paper-500"></i>
+          </div>
+          <h4 class="font-bold text-gray-800 mb-1">题目解析</h4>
+          <p class="text-xs text-gray-400">AI 解析</p>
+        </div>
+
+        <!-- AI 辅导 -->
+        <div class="module-block p-6 text-center fade-in-up" style="animation-delay: 0.2s;" onclick="openModal('tutor')">
+          <div class="w-14 h-14 rounded-2xl bg-paper-100 flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="bot" class="w-7 h-7 text-paper-500"></i>
+          </div>
+          <h4 class="font-bold text-gray-800 mb-1">AI 辅导</h4>
+          <p class="text-xs text-gray-400">对话辅导</p>
+        </div>
+
+        <!-- 拍照识题 -->
+        <div class="module-block p-6 text-center fade-in-up" style="animation-delay: 0.25s;" onclick="openModal('photo')">
+          <div class="w-14 h-14 rounded-2xl bg-paper-100 flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="camera" class="w-7 h-7 text-paper-500"></i>
+          </div>
+          <h4 class="font-bold text-gray-800 mb-1">拍照识题</h4>
+          <p class="text-xs text-gray-400">智能识别</p>
+        </div>
+
+        <!-- 组卷 -->
+        <div class="module-block p-6 text-center fade-in-up" style="animation-delay: 0.3s;" onclick="openModal('paper')">
+          <div class="w-14 h-14 rounded-2xl bg-paper-100 flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="file-stack" class="w-7 h-7 text-paper-500"></i>
+          </div>
+          <h4 class="font-bold text-gray-800 mb-1">组卷</h4>
+          <p class="text-xs text-gray-400">筛选与预览</p>
+        </div>
+
+        <!-- 个人中心 -->
+        <div class="module-block p-6 text-center fade-in-up" style="animation-delay: 0.35s;" onclick="openModal('profile')">
+          <div class="w-14 h-14 rounded-2xl bg-paper-100 flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="user" class="w-7 h-7 text-paper-500"></i>
+          </div>
+          <h4 class="font-bold text-gray-800 mb-1">个人中心</h4>
+          <p class="text-xs text-gray-400">数据与设置</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 模态框 ==================== -->
+  <div id="previewModal" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-content relative" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeModal()">
+        <i data-lucide="x" class="w-5 h-5 text-gray-600"></i>
+      </button>
+      <div class="p-8">
+        <h3 id="modalTitle" class="text-2xl font-bold text-gray-800 mb-2"></h3>
+        <p id="modalDesc" class="text-gray-500 mb-6"></p>
+        <div id="modalImages" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 使用指南 ==================== -->
+  <section id="guide" class="relative py-20 md:py-28 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- 标题 -->
+      <div class="text-center mb-16 fade-in-up">
+        <h2 class="text-3xl md:text-4xl font-black text-gray-800 mb-4">使用指南</h2>
+        <div class="section-divider mb-6"></div>
+        <p class="text-gray-500 text-lg max-w-2xl mx-auto">
+          三步完成错题管理，轻松开启智能学习之旅
+        </p>
+      </div>
+
+      <!-- 使用流程 -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+        <!-- 连接线 -->
+        <div class="hidden md:block absolute top-20 left-1/6 right-1/6 h-0.5 bg-gradient-to-r from-paper-200 via-paper-300 to-paper-200"></div>
+
+        <!-- 步骤1：拍照收集错题 -->
+        <div class="relative text-center fade-in-up">
+          <div class="w-16 h-16 rounded-full bg-gradient-to-br from-paper-500 to-paper-400 flex items-center justify-center text-white font-bold text-xl mx-auto mb-6 shadow-lg shadow-paper-400/30 relative z-10">
+            1
+          </div>
+          <h4 class="text-lg font-bold text-gray-800 mb-3">拍照收集错题</h4>
+          <p class="text-sm text-gray-500 leading-relaxed max-w-xs mx-auto">
+            打开 APP，使用拍照功能对准试卷或练习册。AI 自动识别题目，支持多题同时采集，一键保存到错题本。
+          </p>
+          <div class="mt-6">
+            <img src="assets/ai-zhanshu/photo/相机.png" alt="拍照" class="w-32 h-auto object-contain rounded-2xl mx-auto shadow-lg border-2 border-white bg-paper-50">
+          </div>
+        </div>
+
+        <!-- 步骤2：错题本管理 -->
+        <div class="relative text-center fade-in-up" style="animation-delay: 0.15s;">
+          <div class="w-16 h-16 rounded-full bg-gradient-to-br from-paper-500 to-paper-400 flex items-center justify-center text-white font-bold text-xl mx-auto mb-6 shadow-lg shadow-paper-400/30 relative z-10">
+            2
+          </div>
+          <h4 class="text-lg font-bold text-gray-800 mb-3">错题本管理</h4>
+          <p class="text-sm text-gray-500 leading-relaxed max-w-xs mx-auto">
+            在错题本中按科目、年级、时间筛选错题。查看 AI 解析、进行 AI 辅导对话、获取相似题推荐，深度掌握薄弱知识点。
+          </p>
+          <div class="mt-6">
+            <img src="assets/ai-zhanshu/wrongbook/错题本.png" alt="错题本" class="w-32 h-auto object-contain rounded-2xl mx-auto shadow-lg border-2 border-white bg-paper-50">
+          </div>
+        </div>
+
+        <!-- 步骤3：组卷巩固练习 -->
+        <div class="relative text-center fade-in-up" style="animation-delay: 0.3s;">
+          <div class="w-16 h-16 rounded-full bg-gradient-to-br from-paper-500 to-paper-400 flex items-center justify-center text-white font-bold text-xl mx-auto mb-6 shadow-lg shadow-paper-400/30 relative z-10">
+            3
+          </div>
+          <h4 class="text-lg font-bold text-gray-800 mb-3">组卷巩固练习</h4>
+          <p class="text-sm text-gray-500 leading-relaxed max-w-xs mx-auto">
+            从错题本中筛选薄弱知识点，智能组卷生成专属试卷。导出打印进行线下练习，巩固学习成果。
+          </p>
+          <div class="mt-6">
+            <img src="assets/ai-zhanshu/paper/组卷预览.png" alt="组卷" class="w-32 h-auto object-contain rounded-2xl mx-auto shadow-lg border-2 border-white bg-paper-50">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 项目成果 ==================== -->
+  <section id="value" class="relative py-20 md:py-28">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- 标题 -->
+      <div class="text-center mb-16 fade-in-up">
+        <h2 class="text-3xl md:text-4xl font-black text-gray-800 mb-4">项目成果</h2>
+        <div class="section-divider mb-6"></div>
+        <p class="text-gray-500 text-lg max-w-2xl mx-auto">
+          AI 技术赋能教育，让学习更高效、更智能
+        </p>
+      </div>
+
+      <!-- 价值卡片 -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- 极简高效 -->
+        <div class="feature-card p-6 text-center fade-in-up">
+          <div class="w-14 h-14 rounded-2xl bg-paper-100 flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="zap" class="w-7 h-7 text-paper-500"></i>
+          </div>
+          <h4 class="font-bold text-gray-800 mb-2">极简高效</h4>
+          <p class="text-sm text-gray-500 leading-relaxed">
+            去除冗余功能，专注核心学习场景。三步完成错题管理，节省 80% 整理时间
+          </p>
+        </div>
+
+        <!-- AI 深度解析 -->
+        <div class="feature-card p-6 text-center fade-in-up" style="animation-delay: 0.1s;">
+          <div class="w-14 h-14 rounded-2xl bg-paper-100 flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="brain" class="w-7 h-7 text-paper-500"></i>
+          </div>
+          <h4 class="font-bold text-gray-800 mb-2">AI 深度解析</h4>
+          <p class="text-sm text-gray-500 leading-relaxed">
+            不只是给答案，而是通过 AI 分析解题思路、考察知识点，帮助真正理解
+          </p>
+        </div>
+
+        <!-- 个性化学习 -->
+        <div class="feature-card p-6 text-center fade-in-up" style="animation-delay: 0.2s;">
+          <div class="w-14 h-14 rounded-2xl bg-paper-100 flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="target" class="w-7 h-7 text-paper-500"></i>
+          </div>
+          <h4 class="font-bold text-gray-800 mb-2">个性化学习</h4>
+          <p class="text-sm text-gray-500 leading-relaxed">
+            根据错题数据智能推荐相似题，精准定位薄弱环节，实现因材施教
+          </p>
+        </div>
+
+        <!-- 一站式闭环 -->
+        <div class="feature-card p-6 text-center fade-in-up" style="animation-delay: 0.3s;">
+          <div class="w-14 h-14 rounded-2xl bg-paper-100 flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="repeat" class="w-7 h-7 text-paper-500"></i>
+          </div>
+          <h4 class="font-bold text-gray-800 mb-2">一站式闭环</h4>
+          <p class="text-sm text-gray-500 leading-relaxed">
+            拍照收题 → AI 解析 → 错题归档 → 组卷巩固，完整覆盖学习全流程
+          </p>
+        </div>
+      </div>
+
+      <!-- 对比展示 -->
+      <div class="mt-16 fade-in-up">
+        <div class="feature-card p-8 md:p-12">
+          <h3 class="text-xl font-bold text-gray-800 text-center mb-8">传统方式 vs AI 斩书</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- 传统方式 -->
+            <div class="p-6 bg-red-50/50 rounded-2xl border border-red-100">
+              <div class="flex items-center gap-2 mb-4">
+                <i data-lucide="x-circle" class="w-5 h-5 text-red-400"></i>
+                <span class="font-semibold text-red-600">传统方式</span>
+              </div>
+              <ul class="space-y-3 text-sm text-gray-600">
+                <li class="flex items-start gap-2">
+                  <span class="text-red-400 mt-0.5">-</span>
+                  <span>手动抄题整理，耗时耗力</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-red-400 mt-0.5">-</span>
+                  <span>解析简单，只给答案不讲思路</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-red-400 mt-0.5">-</span>
+                  <span>错题散落各处，难以系统复习</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-red-400 mt-0.5">-</span>
+                  <span>无法针对性练习，效率低下</span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- AI 斩书 -->
+            <div class="p-6 bg-paper-50/50 rounded-2xl border border-paper-200">
+              <div class="flex items-center gap-2 mb-4">
+                <i data-lucide="check-circle" class="w-5 h-5 text-paper-500"></i>
+                <span class="font-semibold text-paper-600">AI 斩书</span>
+              </div>
+              <ul class="space-y-3 text-sm text-gray-600">
+                <li class="flex items-start gap-2">
+                  <span class="text-paper-500 mt-0.5">+</span>
+                  <span>拍照一键收集，AI 自动识别归类</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-paper-500 mt-0.5">+</span>
+                  <span>AI 深度解析，讲解思路和知识点</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-paper-500 mt-0.5">+</span>
+                  <span>智能归档，按科目年级精准筛选</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-paper-500 mt-0.5">+</span>
+                  <span>相似题推荐 + 智能组卷，精准巩固</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 页脚 ==================== -->
+  <footer class="relative py-12 bg-white border-t border-paper-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-paper-500 to-paper-400 flex items-center justify-center text-white">
+            <i data-lucide="book-open" class="w-5 h-5"></i>
+          </div>
+          <span class="font-semibold text-gray-700">AI 斩书</span>
+        </div>
+        <div class="text-center md:text-right">
+          <p class="text-sm text-gray-400">UI/UX 设计作品集 · AI 斩书 项目介绍</p>
+          <p class="text-xs text-gray-300 mt-1">&copy; 2026 蔡文杰. All rights reserved.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JS -->
+  <script>
+    // ==================== 初始化 ====================
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      initNavbar();
+      initMobileMenu();
+      initScrollAnimations();
+      initTabs();
+    });
+
+    // ==================== 导航栏滚动效果 ====================
+    function initNavbar() {
+      const navbar = document.getElementById('navbar');
+      window.addEventListener('scroll', () => {
+        navbar.classList.toggle('scrolled', window.pageYOffset > 50);
+      }, { passive: true });
+    }
+
+    // ==================== 移动端菜单 ====================
+    function initMobileMenu() {
+      const menuToggle = document.getElementById('menuToggle');
+      const mobileMenu = document.getElementById('mobileMenu');
+      let isOpen = false;
+
+      menuToggle.addEventListener('click', () => {
+        isOpen = !isOpen;
+        menuToggle.classList.toggle('active', isOpen);
+        if (isOpen) {
+          mobileMenu.classList.remove('hidden');
+        } else {
+          mobileMenu.classList.add('hidden');
+        }
+      });
+
+      mobileMenu.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          isOpen = false;
+          menuToggle.classList.remove('active');
+          mobileMenu.classList.add('hidden');
+        });
+      });
+
+      document.addEventListener('click', (e) => {
+        if (isOpen && !menuToggle.contains(e.target) && !mobileMenu.contains(e.target)) {
+          isOpen = false;
+          menuToggle.classList.remove('active');
+          mobileMenu.classList.add('hidden');
+        }
+      });
+    }
+
+    // ==================== 滚动入场动画 ====================
+    function initScrollAnimations() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const delay = entry.target.style.animationDelay || '0s';
+            setTimeout(() => {
+              entry.target.classList.add('visible');
+            }, parseFloat(delay) * 1000);
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { rootMargin: '0px 0px -50px 0px', threshold: 0.1 });
+
+      document.querySelectorAll('.fade-in-up, .fade-in-left, .fade-in-right').forEach(el => {
+        observer.observe(el);
+      });
+    }
+
+    // ==================== Tab 切换 ====================
+    // ==================== 模态框 ====================
+    const modalData = {
+      flow: {
+        title: '引导页',
+        desc: '首次启动引导，介绍四大核心功能：拍照收集错题、错题本、组成试卷、AI 辅导',
+        images: [
+          'assets/ai-zhanshu/flow/引导页1.png',
+          'assets/ai-zhanshu/flow/引导页2.png',
+          'assets/ai-zhanshu/flow/引导页3.png',
+          'assets/ai-zhanshu/flow/引导页4.png'
+        ]
+      },
+      home: {
+        title: '首页',
+        desc: '功能快捷入口与最新错题展示，一目了然掌握学习状态',
+        images: ['assets/ai-zhanshu/wrongbook/首页.png']
+      },
+      wrongbook: {
+        title: '错题本',
+        desc: '按科目、年级、时间筛选错题，支持题目解析、AI 辅导、相似题推荐',
+        images: ['assets/ai-zhanshu/wrongbook/错题本.png']
+      },
+      analysis: {
+        title: '题目解析',
+        desc: 'AI 自动分析题目，给出详细解题步骤、答案及考察知识点',
+        images: ['assets/ai-zhanshu/wrongbook/解析.png']
+      },
+      tutor: {
+        title: 'AI 辅导',
+        desc: '针对错题进行个性化 AI 对话辅导，深度追问帮助理解知识点',
+        images: ['assets/ai-zhanshu/wrongbook/AI辅导.png', 'assets/ai-zhanshu/wrongbook/AI辅导弹窗.png']
+      },
+      photo: {
+        title: '拍照识题',
+        desc: '一键拍照，智能识别试卷上的错题，支持多题同时识别并归类',
+        images: [
+          'assets/ai-zhanshu/photo/相机.png',
+          'assets/ai-zhanshu/photo/识别题目.png',
+          'assets/ai-zhanshu/photo/选中题目.png',
+          'assets/ai-zhanshu/photo/选择科目.png'
+        ]
+      },
+      paper: {
+        title: '组卷',
+        desc: '多维度筛选错题，预览试卷，导出打印进行线下练习',
+        images: [
+          'assets/ai-zhanshu/paper/筛选.png',
+          'assets/ai-zhanshu/paper/组卷.png',
+          'assets/ai-zhanshu/paper/组卷预览.png',
+          'assets/ai-zhanshu/paper/确认导出.png'
+        ]
+      },
+      profile: {
+        title: '个人中心',
+        desc: '个人信息管理、学习数据统计、年级科目偏好设置',
+        images: ['assets/ai-zhanshu/个人中心.png']
+      }
+    };
+
+    function openModal(key) {
+      const data = modalData[key];
+      if (!data) return;
+      const modal = document.getElementById('previewModal');
+      document.getElementById('modalTitle').textContent = data.title;
+      document.getElementById('modalDesc').textContent = data.desc;
+      const imagesContainer = document.getElementById('modalImages');
+      imagesContainer.innerHTML = data.images.map(src =>
+        '<div class="rounded-2xl overflow-hidden bg-paper-50 p-2 border border-paper-100">' +
+        '<img src="' + src + '" alt="' + data.title + '" class="w-full h-auto object-contain rounded-xl">' +
+        '</div>'
+      ).join('');
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      lucide.createIcons();
+    }
+
+    function closeModal(e) {
+      if (e && e.target !== e.currentTarget && !e.target.closest('.modal-close')) return;
+      const modal = document.getElementById('previewModal');
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+    function initTabs() {
+      const tabBtns = document.querySelectorAll('.tab-btn');
+      const tabContents = document.querySelectorAll('.tab-content');
+
+      tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          tabBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          const tabId = btn.dataset.tab;
+          tabContents.forEach(content => {
+            content.classList.remove('active');
+            if (content.id === 'tab-' + tabId) {
+              content.classList.add('active');
+              // 重新触发入场动画
+              content.querySelectorAll('.fade-in-up, .fade-in-left, .fade-in-right').forEach(el => {
+                el.classList.remove('visible');
+                requestAnimationFrame(() => {
+                  requestAnimationFrame(() => el.classList.add('visible'));
+                });
+              });
+              // 重新初始化图标
+              lucide.createIcons();
+            }
+          });
+        });
+      });
+    }
+  </script>
+
+</body>
+</html>
