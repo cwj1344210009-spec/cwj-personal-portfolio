@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI斩书 - 筛选错题组卷导出功能 PRD</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            line-height: 1.8;
+            color: #1a1a1a;
+            background: #ffffff;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 60px 40px;
+            text-align: left;
+        }
+
+        /* 标题区域 */
+        .header {
+            text-align: left;
+            margin-bottom: 60px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #000000;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: #666666;
+        }
+
+        /* 章节标题 */
+        h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #000000;
+            margin: 60px 0 24px 0;
+            letter-spacing: -0.3px;
+        }
+
+        h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 36px 0 16px 0;
+        }
+
+        h4 {
+            font-size: 15px;
+            font-weight: 500;
+            color: #333333;
+            margin: 24px 0 10px 0;
+        }
+
+        /* 段落 */
+        p {
+            margin: 10px 0;
+            color: #444444;
+            font-size: 15px;
+            text-align: left;
+        }
+
+        /* 列表 */
+        ul, ol {
+            margin: 10px 0;
+            padding-left: 24px;
+            text-align: left;
+        }
+
+        li {
+            margin: 6px 0;
+            color: #444444;
+            font-size: 15px;
+            text-align: left;
+        }
+
+        /* 表格 */
+        table {
+            width: 100%;
+            margin: 16px 0;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        th {
+            text-align: left;
+            padding: 10px 12px;
+            font-weight: 500;
+            color: #666666;
+            font-size: 13px;
+            border-bottom: 1px solid #eee;
+        }
+
+        td {
+            padding: 12px;
+            color: #333333;
+            vertical-align: top;
+            text-align: left;
+        }
+
+        tr + tr td {
+            padding-top: 14px;
+        }
+
+        /* 强调文本 */
+        strong {
+            font-weight: 600;
+            color: #000000;
+        }
+
+        code {
+            font-family: 'SF Mono', 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        /* 引用块 */
+        blockquote {
+            margin: 20px 0;
+            padding-left: 16px;
+            font-size: 15px;
+            color: #333333;
+            line-height: 1.8;
+            border-left: 3px solid #ddd;
+        }
+
+        /* 流程图容器 */
+        .flowchart-container {
+            margin: 24px 0;
+            padding: 24px 0;
+            text-align: center;
+        }
+
+        .flowchart-container svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* 流程图样式 */
+        .flow-start, .flow-end {
+            fill: #f0f0f0;
+            stroke: #333;
+            stroke-width: 1.5;
+        }
+
+        .flow-process {
+            fill: #ffffff;
+            stroke: #333;
+            stroke-width: 1.5;
+        }
+
+        .flow-decision {
+            fill: #fff9e6;
+            stroke: #333;
+            stroke-width: 1.5;
+        }
+
+        .flow-arrow {
+            stroke: #333;
+            stroke-width: 1.5;
+            fill: none;
+            marker-end: url(#arrowhead);
+        }
+
+        .flow-text {
+            font-size: 12px;
+            fill: #333;
+            text-anchor: middle;
+            dominant-baseline: middle;
+        }
+
+        .flow-label {
+            font-size: 11px;
+            fill: #666;
+        }
+
+        /* 原型图标注 */
+        .prototype-section {
+            margin: 32px 0;
+        }
+
+        .prototype-wrapper {
+            position: relative;
+            margin: 20px 0;
+            display: flex;
+            gap: 32px;
+            align-items: flex-start;
+        }
+
+        .prototype-image {
+            flex: 0 0 280px;
+            position: relative;
+        }
+
+        .prototype-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .prototype-annotations {
+            flex: 1;
+            padding: 8px 0;
+        }
+
+        .annotation-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 16px;
+        }
+
+        .annotation-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .annotation-item {
+            position: relative;
+            padding: 12px 0 12px 24px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .annotation-item:last-child {
+            border-bottom: none;
+        }
+
+        .annotation-item:before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 18px;
+            width: 8px;
+            height: 8px;
+            background: #4A90E2;
+            border-radius: 50%;
+        }
+
+        .annotation-name {
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .annotation-desc {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* 验收清单 */
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checklist li {
+            padding: 8px 0 8px 24px;
+            position: relative;
+            color: #444444;
+        }
+
+        .checklist li:before {
+            content: "○";
+            position: absolute;
+            left: 0;
+            color: #cccccc;
+            font-size: 14px;
+        }
+
+        /* 标签 */
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-right: 6px;
+            border-radius: 3px;
+        }
+
+        .badge-must { background: #ff4d4f; color: white; }
+        .badge-should { background: #faad14; color: white; }
+        .badge-could { background: #1890ff; color: white; }
+
+        /* 风险颜色 */
+        .risk-high { color: #ff4d4f; font-weight: 500; }
+        .risk-medium { color: #faad14; font-weight: 500; }
+        .risk-low { color: #52c41a; font-weight: 500; }
+
+        /* 目录 */
+        .toc {
+            margin-bottom: 48px;
+        }
+
+        .toc ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .toc li {
+            padding: 5px 0;
+        }
+
+        .toc a {
+            color: #666666;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .toc a:hover {
+            color: #000000;
+        }
+
+        /* 分隔线 */
+        .divider {
+            height: 1px;
+            background: #f0f0f0;
+            margin: 48px 0;
+        }
+
+        /* 脚注 */
+        .footer {
+            margin-top: 60px;
+            padding-top: 32px;
+            color: #999999;
+            font-size: 13px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>筛选错题组卷导出功能 PRD</h1>
+            <p>AI斩书 · V1.0</p>
+        </div>
+
+        <!-- 目录 -->
+        <nav class="toc">
+            <ul>
+                <li><a href="#section1">1. 文档头信息</a></li>
+                <li><a href="#section2">2. 项目背景与目标</a></li>
+                <li><a href="#section3">3. 用户故事与需求优先级</a></li>
+                <li><a href="#section4">4. 整体业务流程</a></li>
+                <li><a href="#section5">5. 详细功能说明</a></li>
+                <li><a href="#section6">6. 原型图与交互说明</a></li>
+                <li><a href="#section7">7. 视觉规范</a></li>
+                <li><a href="#section8">8. 数据埋点需求</a></li>
+                <li><a href="#section9">9. 非功能需求</a></li>
+                <li><a href="#section10">10. 验收标准</a></li>
+                <li><a href="#section11">11. 风险评估与应对</a></li>
+                <li><a href="#section12">12. 上线计划</a></li>
+            </ul>
+        </nav>
+
+        <div class="divider"></div>
+
+        <!-- Section 1 -->
+        <h2 id="section1">1. 文档头信息</h2>
+        <table>
+            <tr><th>项</th><th>内容</th></tr>
+            <tr><td>文档名称</td><td>AI斩书 - 筛选错题组卷导出功能 PRD</td></tr>
+            <tr><td>版本号</td><td>V1.0</td></tr>
+            <tr><td>最后更新</td><td>（待填写）</td></tr>
+            <tr><td>产品负责人</td><td>（待填写）</td></tr>
+            <tr><td>UI 负责人</td><td>（待填写）</td></tr>
+            <tr><td>前端负责人</td><td>（待填写）</td></tr>
+            <tr><td>后端负责人</td><td>（待填写）</td></tr>
+            <tr><td>测试负责人</td><td>（待填写）</td></tr>
+            <tr><td>排期</td><td>（待填写）</td></tr>
+            <tr><td>文档状态</td><td>📝 初稿</td></tr>
+        </table>
+
+        <div class="divider"></div>
+
+        <!-- Section 2 -->
+        <h2 id="section2">2. 项目背景与目标</h2>
+
+        <h3>2.1 项目背景</h3>
+
+        <h4>产品现状</h4>
+        <p>AI斩书是一款面向中小学生的AI智能错题管理应用，核心功能包括错题收集、错题本管理和试卷生成。用户可通过拍照或手动录入的方式收集错题，并利用AI技术进行错题分析和相似题推荐。</p>
+
+        <h4>核心数据支撑</h4>
+        <ul>
+            <li>当前错题本功能用户平均累计错题 <strong>50-200道/人</strong></li>
+            <li>错题复习率不足 <strong>35%</strong>，大部分错题收集后未被有效利用</li>
+            <li>用户手动整理一份针对性试卷平均耗时 <strong>45-90分钟</strong></li>
+            <li><strong>68%</strong> 的学生希望有更便捷的方式将错题转化为练习试卷</li>
+        </ul>
+
+        <h4>用户痛点</h4>
+        <ol>
+            <li><strong>错题筛选低效</strong> — 错题本中积累了大量错题，但缺乏有效的筛选手段，用户难以快速定位需要复习的题目</li>
+            <li><strong>组卷流程繁琐</strong> — 需要手动逐道选择题目，再进行排版整理，耗时耗力</li>
+            <li><strong>导出体验不佳</strong> — 现有组卷功能缺乏预览和灵活的导出选项，用户体验有待提升</li>
+        </ol>
+
+        <h4>竞品情况</h4>
+        <table>
+            <tr><th>竞品</th><th>筛选能力</th><th>组卷能力</th><th>导出能力</th></tr>
+            <tr><td>猿题库</td><td>基础筛选</td><td>支持</td><td>PDF导出</td></tr>
+            <tr><td>作业帮</td><td>多维度筛选</td><td>支持</td><td>PDF/图片</td></tr>
+            <tr><td>错题星球</td><td>基础筛选</td><td>支持</td><td>PDF导出</td></tr>
+            <tr><td><strong>AI斩书（本产品）</strong></td><td><strong>待增强</strong></td><td><strong>待优化</strong></td><td><strong>待优化</strong></td></tr>
+        </table>
+
+        <h3>2.2 项目目标</h3>
+
+        <h4>核心目标</h4>
+        <blockquote>错题筛选组卷导出功能的用户使用率达到 <strong>40%</strong>（基于活跃用户数）</blockquote>
+
+        <h4>次要目标</h4>
+        <ol>
+            <li>筛选操作完成率 ≥ <strong>85%</strong></li>
+            <li>组卷导出成功率 ≥ <strong>95%</strong></li>
+            <li>用户组卷平均耗时下降至 <strong>10分钟以内</strong>（现有手动整理需45-90分钟）</li>
+            <li>错题复习率提升至 <strong>50%</strong></li>
+        </ol>
+
+        <h4>非目标（不在本次迭代范围）</h4>
+        <ul>
+            <li>不修改错题收集（拍照/录入）功能</li>
+            <li>不新增知识点标签体系</li>
+            <li>不涉及AI智能组卷推荐（后续版本考虑）</li>
+            <li>不支持多人协作组卷</li>
+        </ul>
+
+        <div class="divider"></div>
+
+        <!-- Section 3 -->
+        <h2 id="section3">3. 用户故事与需求优先级</h2>
+        <p>采用 <strong>MoSCoW</strong> 法则分级</p>
+
+        <h3>Must have（必须做）</h3>
+        <table>
+            <tr><th>编号</th><th>用户故事</th><th>验收标准</th></tr>
+            <tr><td><span class="badge badge-must">M1</span></td><td>作为学生，我希望能按<strong>科目</strong>筛选错题，以便针对性复习某一学科</td><td>支持选择单一科目或全部科目</td></tr>
+            <tr><td><span class="badge badge-must">M2</span></td><td>作为学生，我希望能按<strong>年级</strong>筛选错题，以便找到对应学段的题目</td><td>支持小学、初中、高中各年级筛选</td></tr>
+            <tr><td><span class="badge badge-must">M3</span></td><td>作为学生，我希望能按<strong>收集时间</strong>筛选错题，以便找到近期的错题</td><td>支持今日、本周、本月、全部</td></tr>
+            <tr><td><span class="badge badge-must">M4</span></td><td>作为学生，我希望能<strong>勾选多道错题</strong>进行批量组卷</td><td>支持单选、多选、全选操作</td></tr>
+            <tr><td><span class="badge badge-must">M5</span></td><td>作为学生，我希望能<strong>预览生成的试卷</strong>，确认题目内容</td><td>生成试卷前可预览，支持翻页</td></tr>
+            <tr><td><span class="badge badge-must">M6</span></td><td>作为学生，我希望能<strong>导出试卷为PDF</strong>，方便打印练习</td><td>支持PDF格式导出</td></tr>
+            <tr><td><span class="badge badge-must">M7</span></td><td>作为学生，我希望导出时可以选择是否显示<strong>答案解析</strong></td><td>支持开启/关闭答案解析显示</td></tr>
+        </table>
+
+        <h3>Should have（应该做）</h3>
+        <table>
+            <tr><th>编号</th><th>用户故事</th><th>验收标准</th></tr>
+            <tr><td><span class="badge badge-should">S1</span></td><td>作为学生，我希望能按<strong>掌握程度</strong>筛选错题，以便重点复习不懂的题目</td><td>支持"懂了"、"不懂"筛选</td></tr>
+            <tr><td><span class="badge badge-should">S2</span></td><td>作为学生，我希望能按<strong>来源</strong>筛选错题，如举一反三题目</td><td>支持"举一反三"、"未标记"筛选</td></tr>
+            <tr><td><span class="badge badge-should">S3</span></td><td>作为学生，我希望能<strong>删除不需要的错题</strong>，保持错题本整洁</td><td>支持单选删除和批量删除</td></tr>
+            <tr><td><span class="badge badge-should">S4</span></td><td>作为学生，删除前希望有<strong>确认提示</strong>，避免误操作</td><td>弹出确认弹窗</td></tr>
+            <tr><td><span class="badge badge-should">S5</span></td><td>作为学生，我希望在<strong>选择模式</strong>下能快速全选或取消全选</td><td>提供全选/取消全选按钮</td></tr>
+        </table>
+
+        <h3>Could have（可以做）</h3>
+        <table>
+            <tr><th>编号</th><th>用户故事</th><th>验收标准</th></tr>
+            <tr><td><span class="badge badge-could">C1</span></td><td>作为学生，我希望导出时可以选择<strong>相似题</strong>替代原题</td><td>预览时支持切换"原题"/"相似题"</td></tr>
+            <tr><td><span class="badge badge-could">C2</span></td><td>作为学生，我希望查看试卷的<strong>页码信息</strong></td><td>显示当前页/总页数</td></tr>
+            <tr><td><span class="badge badge-could">C3</span></td><td>作为学生，我希望在首页能<strong>快速进入组卷功能</strong></td><td>首页提供便捷入口</td></tr>
+        </table>
+
+        <h3>Won't have（不做）</h3>
+        <ul>
+            <li>批量修改题目标签</li>
+            <li>智能推荐组卷（AI根据薄弱点推荐）</li>
+            <li>多人协作组卷</li>
+            <li>自定义试卷模板</li>
+        </ul>
+
+        <div class="divider"></div>
+
+        <!-- Section 4 -->
+        <h2 id="section4">4. 整体业务流程</h2>
+
+        <h3>4.1 主流程</h3>
+        <div class="flowchart-container">
+            <svg width="600" height="520" viewBox="0 0 600 520">
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+                    </marker>
+                </defs>
+
+                <!-- Start -->
+                <rect x="240" y="10" width="120" height="40" rx="20" class="flow-start"/>
+                <text x="300" y="35" class="flow-text">开始</text>
+
+                <!-- Arrow down -->
+                <line x1="300" y1="50" x2="300" y2="80" class="flow-arrow"/>
+
+                <!-- Process 1 -->
+                <rect x="200" y="80" width="200" height="40" class="flow-process"/>
+                <text x="300" y="105" class="flow-text">进入组成试卷页面</text>
+
+                <!-- Arrow down -->
+                <line x1="300" y1="120" x2="300" y2="150" class="flow-arrow"/>
+
+                <!-- Decision 1 -->
+                <polygon points="300,150 400,190 300,230 200,190" class="flow-decision"/>
+                <text x="300" y="195" class="flow-text">是否需要筛选？</text>
+
+                <!-- Yes path -->
+                <line x1="400" y1="190" x2="460" y2="190" class="flow-arrow"/>
+                <line x1="460" y1="190" x2="460" y2="240" class="flow-arrow"/>
+                <rect x="380" y="240" width="160" height="40" class="flow-process"/>
+                <text x="460" y="265" class="flow-text">进入筛选页面</text>
+                <text x="430" y="185" class="flow-label">是</text>
+
+                <!-- No path -->
+                <line x1="300" y1="230" x2="300" y2="270" class="flow-arrow"/>
+                <text x="310" y="255" class="flow-label">否</text>
+
+                <!-- Merge point -->
+                <rect x="200" y="270" width="200" height="40" class="flow-process"/>
+                <text x="300" y="295" class="flow-text">点击"管理"进入选择模式</text>
+
+                <!-- Arrow from filter -->
+                <line x1="460" y1="280" x2="460" y2="310" class="flow-arrow"/>
+                <line x1="460" y1="310" x2="400" y2="310" class="flow-arrow"/>
+
+                <!-- Arrow down -->
+                <line x1="300" y1="310" x2="300" y2="340" class="flow-arrow"/>
+
+                <!-- Process -->
+                <rect x="180" y="340" width="240" height="40" class="flow-process"/>
+                <text x="300" y="365" class="flow-text">勾选需要组卷的错题</text>
+
+                <!-- Arrow down -->
+                <line x1="300" y1="380" x2="300" y2="410" class="flow-arrow"/>
+
+                <!-- Process -->
+                <rect x="200" y="410" width="200" height="40" class="flow-process"/>
+                <text x="300" y="435" class="flow-text">点击"选择组卷"</text>
+
+                <!-- Arrow down -->
+                <line x1="300" y1="450" x2="300" y2="480" class="flow-arrow"/>
+
+                <!-- End -->
+                <rect x="240" y="480" width="120" height="40" rx="20" class="flow-end"/>
+                <text x="300" y="505" class="flow-text">生成试卷</text>
+            </svg>
+        </div>
+
+        <h3>4.2 筛选子流程</h3>
+        <div class="flowchart-container">
+            <svg width="500" height="400" viewBox="0 0 500 400">
+                <defs>
+                    <marker id="arrowhead2" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+                    </marker>
+                </defs>
+
+                <!-- Start -->
+                <rect x="190" y="10" width="120" height="40" rx="20" class="flow-start"/>
+                <text x="250" y="35" class="flow-text">开始筛选</text>
+
+                <!-- Arrow down -->
+                <line x1="250" y1="50" x2="250" y2="80" class="flow-arrow"/>
+
+                <!-- Process -->
+                <rect x="150" y="80" width="200" height="40" class="flow-process"/>
+                <text x="250" y="105" class="flow-text">点击筛选按钮</text>
+
+                <!-- Arrow down -->
+                <line x1="250" y1="120" x2="250" y2="150" class="flow-arrow"/>
+
+                <!-- Process -->
+                <rect x="150" y="150" width="200" height="40" class="flow-process"/>
+                <text x="250" y="175" class="flow-text">选择筛选条件</text>
+
+                <!-- Arrow down -->
+                <line x1="250" y1="190" x2="250" y2="220" class="flow-arrow"/>
+
+                <!-- Process -->
+                <rect x="150" y="220" width="200" height="40" class="flow-process"/>
+                <text x="250" y="245" class="flow-text">系统筛选并更新列表</text>
+
+                <!-- Arrow down -->
+                <line x1="250" y1="260" x2="250" y2="290" class="flow-arrow"/>
+
+                <!-- Decision -->
+                <polygon points="250,290 350,330 250,370 150,330" class="flow-decision"/>
+                <text x="250" y="335" class="flow-text">结果是否为空？</text>
+
+                <!-- Yes path -->
+                <line x1="350" y1="330" x2="420" y2="330" class="flow-arrow"/>
+                <rect x="420" y="310" width="70" height="40" class="flow-process"/>
+                <text x="455" y="335" class="flow-text">空状态</text>
+                <text x="370" y="325" class="flow-label">是</text>
+
+                <!-- No path -->
+                <line x1="250" y1="370" x2="250" y2="395" class="flow-arrow"/>
+                <text x="260" y="385" class="flow-label">否</text>
+            </svg>
+        </div>
+
+        <h3>4.3 组卷导出子流程</h3>
+        <div class="flowchart-container">
+            <svg width="600" height="350" viewBox="0 0 600 350">
+                <defs>
+                    <marker id="arrowhead3" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+                    </marker>
+                </defs>
+
+                <!-- Start -->
+                <rect x="50" y="30" width="120" height="40" rx="20" class="flow-start"/>
+                <text x="110" y="55" class="flow-text">已选题目</text>
+
+                <!-- Arrow right -->
+                <line x1="170" y1="50" x2="210" y2="50" class="flow-arrow"/>
+
+                <!-- Process -->
+                <rect x="210" y="30" width="120" height="40" class="flow-process"/>
+                <text x="270" y="55" class="flow-text">生成试卷</text>
+
+                <!-- Arrow right -->
+                <line x1="330" y1="50" x2="370" y2="50" class="flow-arrow"/>
+
+                <!-- Process -->
+                <rect x="370" y="30" width="120" height="40" class="flow-process"/>
+                <text x="430" y="55" class="flow-text">预览试卷</text>
+
+                <!-- Arrow right -->
+                <line x1="490" y1="50" x2="530" y2="50" class="flow-arrow"/>
+
+                <!-- Process -->
+                <rect x="530" y="30" width="60" height="40" class="flow-process"/>
+                <text x="560" y="55" class="flow-text">导出</text>
+
+                <!-- Arrow down from preview -->
+                <line x1="430" y1="70" x2="430" y2="110" class="flow-arrow"/>
+
+                <!-- Decision -->
+                <polygon points="430,110 510,150 430,190 350,150" class="flow-decision"/>
+                <text x="430" y="155" class="flow-text">选择题型</text>
+
+                <!-- Left path -->
+                <line x1="350" y1="150" x2="290" y2="150" class="flow-arrow"/>
+                <rect x="210" y="130" width="80" height="40" class="flow-process"/>
+                <text x="250" y="155" class="flow-text">原题</text>
+                <text x="320" y="145" class="flow-label">原题</text>
+
+                <!-- Right path -->
+                <line x1="510" y1="150" x2="550" y2="150" class="flow-arrow"/>
+                <rect x="550" y="130" width="50" height="40" class="flow-process"/>
+                <text x="575" y="155" class="flow-text">相似</text>
+                <text x="530" y="145" class="flow-label">相似题</text>
+
+                <!-- Arrow down -->
+                <line x1="430" y1="190" x2="430" y2="230" class="flow-arrow"/>
+
+                <!-- Process -->
+                <rect x="350" y="230" width="160" height="40" class="flow-process"/>
+                <text x="430" y="255" class="flow-text">选择导出选项</text>
+
+                <!-- Arrow down -->
+                <line x1="430" y1="270" x2="430" y2="300" class="flow-arrow"/>
+
+                <!-- End -->
+                <rect x="370" y="300" width="120" height="40" rx="20" class="flow-end"/>
+                <text x="430" y="325" class="flow-text">导出PDF</text>
+            </svg>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Section 5 -->
+        <h2 id="section5">5. 详细功能说明</h2>
+
+        <h3>5.1 入口与导航</h3>
+
+        <h4>5.1.1 首页入口</h4>
+        <ul>
+            <li><strong>位置</strong> — 首页功能区"组成试卷"卡片</li>
+            <li><strong>图标</strong> — 显示"组成试卷"文字 + 相关图标</li>
+            <li><strong>文案</strong> — 副标题"组卷·AI推荐"</li>
+            <li><strong>点击</strong> — 跳转至"组成试卷"页面</li>
+        </ul>
+
+        <h4>5.1.2 底部导航入口</h4>
+        <ul>
+            <li><strong>位置</strong> — 底部导航栏第三个Tab</li>
+            <li><strong>图标</strong> — 组卷相关图标</li>
+            <li><strong>文案</strong> — "组成试卷"</li>
+            <li><strong>点击</strong> — 直接进入组成试卷页面</li>
+        </ul>
+
+        <h3>5.2 组成试卷页面（错题列表）</h3>
+
+        <h4>5.2.1 页面布局</h4>
+        <table>
+            <tr><th>区域</th><th>内容</th><th>说明</th></tr>
+            <tr><td>顶部导航栏</td><td>返回箭头、页面标题"组成试卷"、"管理"按钮</td><td>-</td></tr>
+            <tr><td>筛选条件栏</td><td>科目下拉、年级下拉、时间下拉、筛选按钮</td><td>快速筛选入口</td></tr>
+            <tr><td>错题列表</td><td>错题卡片列表</td><td>支持滚动加载</td></tr>
+            <tr><td>列表项</td><td>日期、状态标签、题目内容、操作按钮</td><td>-</td></tr>
+        </table>
+
+        <h4>5.2.2 筛选条件栏</h4>
+        <ul>
+            <li><strong>科目下拉</strong> — 默认显示"英语"，点击展开选择（单选）</li>
+            <li><strong>年级下拉</strong> — 默认显示"初一"，点击展开选择（单选）</li>
+            <li><strong>时间下拉</strong> — 默认显示"时间"，点击展开选择（单选）</li>
+            <li><strong>筛选按钮</strong> — 点击进入完整筛选页面</li>
+        </ul>
+
+        <h4>5.2.3 错题卡片</h4>
+        <p>每张卡片包含以下信息：</p>
+        <ul>
+            <li><strong>状态标签</strong> — "未斩题"（蓝色）/ "已斩题"（红色）</li>
+            <li><strong>日期</strong> — 如"2025.02.16"</li>
+            <li><strong>题目类型</strong> — 如"闯关任务"</li>
+            <li><strong>题目内容</strong> — 题目文字 + 选项</li>
+            <li><strong>操作按钮</strong> — 解析、辅导、相似题</li>
+        </ul>
+
+        <h4>5.2.4 空状态</h4>
+        <ul>
+            <li>当筛选结果为空时，显示空状态提示</li>
+            <li>文案："暂无符合条件的错题"</li>
+            <li>建议："试试调整筛选条件"</li>
+        </ul>
+
+        <h3>5.3 筛选页面</h3>
+
+        <h4>5.3.1 页面布局</h4>
+        <table>
+            <tr><th>区域</th><th>内容</th><th>说明</th></tr>
+            <tr><td>顶部导航栏</td><td>返回箭头、页面标题"筛选"</td><td>-</td></tr>
+            <tr><td>科目区域</td><td>标题 + 选项网格</td><td>单选</td></tr>
+            <tr><td>来源区域</td><td>标题 + 选项网格</td><td>单选</td></tr>
+            <tr><td>掌握程度区域</td><td>标题 + 选项网格</td><td>单选</td></tr>
+            <tr><td>收集时间区域</td><td>标题 + 选项网格</td><td>单选</td></tr>
+            <tr><td>年级区域</td><td>标题 + 选项网格</td><td>单选</td></tr>
+        </table>
+
+        <h4>5.3.2 筛选维度详情</h4>
+        <table>
+            <tr><th>维度</th><th>选项</th><th>默认值</th><th>选择方式</th></tr>
+            <tr><td>科目</td><td>全部、语文、数学、英语、科学、物理、化学、生物、地理、历史、政治、其他</td><td>全部</td><td>单选</td></tr>
+            <tr><td>来源</td><td>全部、举一反三、未标记</td><td>全部</td><td>单选</td></tr>
+            <tr><td>掌握程度</td><td>全部、懂了、不懂</td><td>全部</td><td>单选</td></tr>
+            <tr><td>收集时间</td><td>全部、今日、本周、本月</td><td>全部</td><td>单选</td></tr>
+            <tr><td>年级</td><td>全部、一年级~高三、其他</td><td>全部</td><td>单选</td></tr>
+        </table>
+
+        <h4>5.3.3 交互说明</h4>
+        <ul>
+            <li>选中状态 — 背景色变为蓝色（#E8F4FD），文字变为蓝色</li>
+            <li>未选中状态 — 背景色为灰色（#F5F5F5），文字为黑色</li>
+            <li>点击选项后立即生效，无需确认按钮</li>
+            <li>点击左上角返回箭头返回列表，筛选条件保持</li>
+        </ul>
+
+        <h4>5.3.4 筛选逻辑</h4>
+        <ul>
+            <li>各维度之间为 <strong>AND</strong> 关系</li>
+            <li>同一维度内为 <strong>OR</strong> 关系（但本版本为单选）</li>
+            <li>筛选条件实时更新列表内容</li>
+        </ul>
+
+        <h3>5.4 选择模式</h3>
+
+        <h4>5.4.1 进入方式</h4>
+        <p>在组成试卷页面点击右上角"管理"按钮进入</p>
+
+        <h4>5.4.2 页面布局</h4>
+        <table>
+            <tr><th>区域</th><th>内容</th><th>说明</th></tr>
+            <tr><td>顶部导航栏</td><td>"取消"按钮、页面标题、"全选"按钮</td><td>-</td></tr>
+            <tr><td>筛选条件栏</td><td>与组成试卷页面相同</td><td>支持筛选</td></tr>
+            <tr><td>错题列表</td><td>每项右侧增加复选框</td><td>-</td></tr>
+            <tr><td>底部操作栏</td><td>"删除"按钮（红色）、"选择组卷"按钮（蓝色）</td><td>-</td></tr>
+        </table>
+
+        <h4>5.4.3 复选框交互</h4>
+        <ul>
+            <li><strong>位置</strong> — 每道题右侧</li>
+            <li><strong>未选中</strong> — 灰色边框圆形</li>
+            <li><strong>已选中</strong> — 蓝色填充 + 白色对勾</li>
+            <li><strong>点击</strong> — 切换选中/未选中状态</li>
+        </ul>
+
+        <h4>5.4.4 全选功能</h4>
+        <ul>
+            <li><strong>位置</strong> — 右上角</li>
+            <li><strong>默认文字</strong> — "全选"</li>
+            <li><strong>点击后</strong> — 文字变为"取消全选"，所有题目被选中</li>
+            <li><strong>再次点击</strong> — 文字变为"全选"，所有题目取消选中</li>
+        </ul>
+
+        <h4>5.4.5 底部操作栏</h4>
+        <p><strong>删除按钮</strong></p>
+        <ul>
+            <li>未选中任何题目时：灰色，不可点击</li>
+            <li>选中题目后：红色，可点击</li>
+            <li>点击后弹出确认弹窗</li>
+        </ul>
+
+        <p><strong>选择组卷按钮</strong></p>
+        <ul>
+            <li>未选中任何题目时：灰色，不可点击</li>
+            <li>选中题目后：蓝色，可点击</li>
+            <li>点击后生成试卷</li>
+        </ul>
+
+        <h3>5.5 删除功能</h3>
+
+        <h4>5.5.1 删除确认弹窗</h4>
+        <table>
+            <tr><th>元素</th><th>内容</th><th>样式</th></tr>
+            <tr><td>标题</td><td>"错题删除后不可恢复，确认是否删除？"</td><td>黑色加粗</td></tr>
+            <tr><td>取消按钮</td><td>"取消"</td><td>蓝色文字，左侧</td></tr>
+            <tr><td>确认按钮</td><td>"确认删除"</td><td>红色文字，右侧</td></tr>
+        </table>
+
+        <h4>5.5.2 交互流程</h4>
+        <ol>
+            <li>用户点击"删除"按钮</li>
+            <li>弹出确认弹窗，背景变暗</li>
+            <li>点击"取消"：关闭弹窗，返回选择模式</li>
+            <li>点击"确认删除"：执行删除操作</li>
+            <li>删除成功后：刷新列表，退出选择模式</li>
+        </ol>
+
+        <h4>5.5.3 边界情况</h4>
+        <ul>
+            <li>删除所有错题后：显示空状态页面</li>
+            <li>删除过程中：显示加载动画，禁用操作</li>
+        </ul>
+
+        <h3>5.6 试卷预览页面</h3>
+
+        <h4>5.6.1 页面布局</h4>
+        <table>
+            <tr><th>区域</th><th>内容</th><th>说明</th></tr>
+            <tr><td>顶部导航栏</td><td>返回箭头、页面标题"生成试卷"</td><td>-</td></tr>
+            <tr><td>切换按钮组</td><td>"原题"、"相似题"</td><td>切换显示内容</td></tr>
+            <tr><td>试卷预览区</td><td>试卷内容展示</td><td>支持上下滚动、翻页</td></tr>
+            <tr><td>页码指示器</td><td>"1/2" + 左右箭头</td><td>显示当前页/总页数</td></tr>
+            <tr><td>底部信息栏</td><td>"已选错题"图标、"显示内容：答案解析"</td><td>-</td></tr>
+            <tr><td>导出按钮</td><td>"导出组卷"按钮</td><td>蓝色主按钮</td></tr>
+        </table>
+
+        <h4>5.6.2 试卷内容展示</h4>
+        <ul>
+            <li><strong>格式</strong> — 模拟真实试卷排版</li>
+            <li><strong>内容</strong> — 题目序号、题目内容、选项、图片</li>
+            <li><strong>品牌标识</strong> — 试卷顶部显示"斩书"品牌信息</li>
+            <li><strong>水印</strong> — 可选显示用户信息水印</li>
+        </ul>
+
+        <h4>5.6.3 原题/相似题切换</h4>
+        <ul>
+            <li><strong>原题</strong> — 显示用户选择的原始错题</li>
+            <li><strong>相似题</strong> — AI生成的相似题目（难度相近、知识点相同）</li>
+            <li><strong>切换交互</strong> — 点击Tab切换，无加载动画</li>
+        </ul>
+
+        <h4>5.6.4 翻页功能</h4>
+        <ul>
+            <li><strong>翻页按钮</strong> — 左右箭头</li>
+            <li><strong>页码显示</strong> — "当前页/总页数"</li>
+            <li><strong>边界处理</strong> — 第一页时左箭头灰色不可点，最后一页时右箭头灰色不可点</li>
+        </ul>
+
+        <h3>5.7 导出功能</h3>
+
+        <h4>5.7.1 导出选项</h4>
+        <ul>
+            <li><strong>显示答案解析</strong> — 开关控制，默认开启
+                <ul>
+                    <li>开启：试卷包含答案和解析</li>
+                    <li>关闭：试卷仅包含题目</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h4>5.7.2 导出流程</h4>
+        <ol>
+            <li>用户点击"导出组卷"按钮</li>
+            <li>显示导出选项（答案解析开关）</li>
+            <li>用户确认导出</li>
+            <li>显示"生成中..."加载状态</li>
+            <li>生成完成后：显示成功提示，提供保存/分享选项</li>
+        </ol>
+
+        <h4>5.7.3 导出格式</h4>
+        <ul>
+            <li><strong>格式</strong> — PDF</li>
+            <li><strong>保存位置</strong> — 本地存储 + 系统分享</li>
+        </ul>
+
+        <h4>5.7.4 成功提示</h4>
+        <ul>
+            <li><strong>提示文案</strong> — "导出成功"</li>
+            <li><strong>操作选项</strong> — 查看文件、分享给好友、打印</li>
+        </ul>
+
+        <div class="divider"></div>
+
+        <!-- Section 6: 原型图与交互说明 -->
+        <h2 id="section6">6. 原型图与交互说明</h2>
+
+        <h3>6.1 首页入口</h3>
+        <div class="prototype-section">
+            <div class="prototype-wrapper">
+                <div class="prototype-image">
+                    <img src="组卷增加筛选功能PRD需求/1-首页.png" alt="首页原型图">
+                </div>
+                <div class="prototype-annotations">
+                    <div class="annotation-title">界面元素说明</div>
+                    <ul class="annotation-list">
+                        <li class="annotation-item">
+                            <div class="annotation-name">① 组成试卷卡片</div>
+                            <div class="annotation-desc">位于首页功能区第三个位置，点击后跳转至组成试卷页面。</div>
+                        </li>
+                        <li class="annotation-item">
+                            <div class="annotation-name">② 底部导航栏</div>
+                            <div class="annotation-desc">第三个Tab为"组成试卷"入口，用户可从任意页面快速进入组卷功能。</div>
+                        </li>
+                        <li class="annotation-item">
+                            <div class="annotation-name">交互逻辑</div>
+                            <div class="annotation-desc">点击任一入口进入组成试卷页面，展示用户的错题列表。</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h3>6.2 组成试卷页面</h3>
+        <div class="prototype-section">
+            <div class="prototype-wrapper">
+                <div class="prototype-image">
+                    <img src="组卷增加筛选功能PRD需求/2-错题本.png" alt="组成试卷页面原型图">
+                </div>
+                <div class="prototype-annotations">
+                    <div class="annotation-title">界面元素说明</div>
+                    <ul class="annotation-list">
+                        <li class="annotation-item">
+                            <div class="annotation-name">① 筛选条件栏</div>
+                            <div class="annotation-desc">包含科目下拉、年级下拉、时间下拉、筛选按钮。支持快速筛选和进入完整筛选页面。</div>
+                        </li>
+                        <li class="annotation-item">
+                            <div class="annotation-name">② "管理"按钮</div>
+                            <div class="annotation-desc">点击后进入选择模式，可批量选择题目进行删除或组卷操作。</div>
+                        </li>
+                        <li class="annotation-item">
+                            <div class="annotation-name">③ 错题卡片</div>
+                            <div class="annotation-desc">显示错题的日期、状态标签（未斩题/已斩题）、题目内容和操作按钮（解析、辅导、相似题）。</div>
+                        </li>
+                        <li class="annotation-item">
+                            <div class="annotation-name">状态说明</div>
+                            <div class="annotation-desc">
+                                • 未斩题（蓝色标签）：用户尚未掌握的错题<br>
+                                • 已斩题（红色标签）：用户已完成学习的错题
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h3>6.3 筛选页面</h3>
+        <div class="prototype-section">
+            <div class="prototype-wrapper">
+                <div class="prototype-image">
+                    <img src="组卷增加筛选功能PRD需求/3-筛选错题.png" alt="筛选页面原型图">
+                </div>
+                <div class="prototype-annotations">
+                    <div class="annotation-title">界面元素说明</div>
+                    <ul class="annotation-list">
+                        <li class="annotation-item">
+                            <div class="annotation-name">① 科目筛选</div>
+                            <div class="annotation-desc">支持选择全部或单一科目，包括语文、数学、英语、科学、物理、化学、生物、地理、历史、政治等。</div>
+                        </li>
+                        <li class="annotation-item">
+                            <div class="annotation-name">② 来源筛选</div>
+                            <div class="annotation-desc">支持按题目来源筛选：全部、举一反三、未标记。</div>
+                        </li>
+                        <li class="annotation-item">
+                            <div class="annotation-name">③ 掌握程度筛选</div>
+                            <div class="annotation-desc">支持按掌握程度筛选：全部、懂了、不懂。</div>
+                        </li>
+                        <li class="annotation-item">
+                            <div class="annotation-name">④ 收集时间筛选</div>
+                            <div class="annotation-desc">支持按时间范围筛选：全部、今日、本周、本月。</div>
+                        </li>
+                        <li class="annotation-item">
+                            <div class="annotation-name">⑤ 年级筛选</div>
+                            <div class="annotation-desc">支持按年级筛选：全部、一年级至高三、其他。</div>
+                        </li>
+                        <li class="annotation-item">
+                            <div class="annotation-name">交互逻辑</div>
+                            <div class="annotation-desc">各筛选条件为单选模式，点击选项后立即生效，点击返回箭头回到列表页并保持筛选条件。</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h3>6.3 选择模式</h3>
+        <div class="prototype-section">
+            <div class="prototype-wrapper">
+                <div class="prototype-image">
+                    <img src="组卷增加筛选功能PRD需求/5-勾选具体错题.png" alt="选择模式原型图">
+                </div>
+                <div class="prototype-annotations">
+                    <div class="annotation-title">界面元素说明</div>
+                    <ul class="annotation-list">
+                        <li class="annotation-item">
+                            <div class="annotation-name">① "取消"按钮</div>
+                            <div class="annotation-desc">点击后退出选择模式，返回普通列表状态。</div>
+                        </li>
+                        <li class="annotation-item">
+                            <div class="annotation-name">② "全选"按钮</div>
+                            <div class="annotation-desc">点击后选中所有题目，按钮文字变为"取消全选"。</div>
+                        </li>
+                        <li class="annotation-item">
+                            <div class="annotation-name">③ 复选框</div>
+                            <div class="annotation-desc">每道题右侧显示复选框，点击可勾选/取消勾选。选中后显示蓝色对勾。</div>
+                        </li>
+                        <li class="annotation-item">
+                            <div class="annotation-name">④ "删除"按钮</div>
+                            <div class="annotation-desc">红色按钮，选中题目后可点击，点击后弹出确认弹窗。</div>
+                        </li>
+                        <li class="annotation-item">
+                            <div class="annotation-name">⑤ "选择组卷"按钮</div>
+                            <div class="annotation-desc">蓝色按钮，选中题目后可点击，点击后生成试卷。</div>
+                        </li>
+                        <li class="annotation-item">
+                            <div class="annotation-name">按钮状态</div>
+                            <div class="annotation-desc">未选中题目时，删除和选择组卷按钮置灰不可点击；选中后变为可点击状态。</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h3>6.4 删除确认弹窗</h3>
+        <div class="prototype-section">
+            <div class="prototype-wrapper">
+                <div class="prototype-image">
+                    <img src="组卷增加筛选功能PRD需求/5-删除.png" alt="删除确认弹窗原型图">
+                </div>
+                <div class="prototype-annotations">
+                    <div class="annotation-title">界面元素说明</div>
+                    <ul class="annotation-list">
+                        <li class="annotation-item">
+                            <div class="annotation-name">① 弹窗标题</div>
+                            <div class="annotation-desc">显示"错题删除后不可恢复，确认是否删除？"，提醒用户操作不可逆。</div>
+                        </li>
+                        <li class="annotation-item">
+                            <div class="annotation-name">② "取消"按钮</div>
+                            <div class="annotation-desc">蓝色文字，点击后关闭弹窗，返回选择模式，保持勾选状态。</div>
+                        </li>
+                        <li class="annotation-item">
+                            <div class="annotation-name">③ "确认删除"按钮</div>
+                            <div class="annotation-desc">红色文字，点击后执行删除操作，删除完成后刷新列表。</div>
+                        </li>
+                        <li class="annotation-item">
+                            <div class="annotation-name">交互逻辑</div>
+                            <div class="annotation-desc">弹窗弹出时背景变暗，点击背景不会关闭弹窗，强制用户做出选择。</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h3>6.4 选择组卷</h3>
+        <div class="prototype-section">
+            <div class="prototype-wrapper">
+                <div class="prototype-image">
+                    <img src="组卷增加筛选功能PRD需求/5-选择组卷的题目.png" alt="选择组卷原型图">
+                </div>
+                <div class="prototype-annotations">
+                    <div class="annotation-title">界面元素说明</div>
+                    <ul class="annotation-list">
+                        <li class="annotation-item">
+                            <div class="annotation-name">① 已选题目状态</div>
+                            <div class="annotation-desc">被选中的题目右侧复选框显示蓝色对勾，背景可能有轻微高亮。</div>
+                        </li>
+                        <li class="annotation-item">
+                            <div class="annotation-name">② "选择组卷"按钮</div>
+                            <div class="annotation-desc">蓝色主按钮，点击后系统根据选中的题目生成试卷预览。</div>
+                        </li>
+                        <li class="annotation-item">
+                            <div class="annotation-name">交互逻辑</div>
+                            <div class="annotation-desc">点击"选择组卷"后，系统进行组卷处理并跳转至试卷预览页面。</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h3>6.5 试卷预览与导出</h3>
+        <div class="prototype-section">
+            <div class="prototype-wrapper">
+                <div class="prototype-image">
+                    <img src="组卷增加筛选功能PRD需求/6-导出.png" alt="试卷预览原型图">
+                </div>
+                <div class="prototype-annotations">
+                    <div class="annotation-title">界面元素说明</div>
+                    <ul class="annotation-list">
+                        <li class="annotation-item">
+                            <div class="annotation-name">① 原题/相似题切换</div>
+                            <div class="annotation-desc">顶部Tab切换，可选择显示原始错题或AI生成的相似题。</div>
+                        </li>
+                        <li class="annotation-item">
+                            <div class="annotation-name">② 试卷预览区</div>
+                            <div class="annotation-desc">展示生成的试卷内容，包含品牌标识、题目、选项等。支持上下滚动。</div>
+                        </li>
+                        <li class="annotation-item">
+                            <div class="annotation-name">③ 页码指示器</div>
+                            <div class="annotation-desc">显示当前页/总页数（如"1/2"），支持左右翻页。</div>
+                        </li>
+                        <li class="annotation-item">
+                            <div class="annotation-name">④ 答案解析开关</div>
+                            <div class="annotation-desc">控制导出时是否显示答案解析，默认开启。</div>
+                        </li>
+                        <li class="annotation-item">
+                            <div class="annotation-name">⑤ "导出组卷"按钮</div>
+                            <div class="annotation-desc">蓝色主按钮，点击后生成PDF文件并提供保存/分享选项。</div>
+                        </li>
+                        <li class="annotation-item">
+                            <div class="annotation-name">交互逻辑</div>
+                            <div class="annotation-desc">预览页面支持原题/相似题切换，翻页浏览，确认无误后点击导出。</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Section 7 -->
+        <h2 id="section7">7. 视觉规范</h2>
+
+        <h3>7.1 颜色规范</h3>
+        <table>
+            <tr><th>用途</th><th>颜色值</th></tr>
+            <tr><td>主色调（品牌蓝）</td><td>#4A90E2</td></tr>
+            <tr><td>选中状态</td><td>#E8F4FD（背景）/ #4A90E2（文字/边框）</td></tr>
+            <tr><td>未选中状态</td><td>#F5F5F5（背景）/ #333333（文字）</td></tr>
+            <tr><td>删除按钮</td><td>#FF4D4F</td></tr>
+            <tr><td>确认删除文字</td><td>#FF4D4F</td></tr>
+            <tr><td>取消按钮文字</td><td>#4A90E2</td></tr>
+            <tr><td>状态标签（未斩题）</td><td>#4A90E2（背景）/ #FFFFFF（文字）</td></tr>
+            <tr><td>状态标签（已斩题）</td><td>#FF4D4F（背景）/ #FFFFFF（文字）</td></tr>
+            <tr><td>禁用状态</td><td>#CCCCCC</td></tr>
+        </table>
+
+        <h3>7.2 字体规范</h3>
+        <table>
+            <tr><th>场景</th><th>字号</th><th>字重</th><th>颜色</th></tr>
+            <tr><td>页面标题</td><td>18px</td><td>Semi Bold</td><td>#333333</td></tr>
+            <tr><td>筛选维度标题</td><td>16px</td><td>Medium</td><td>#333333</td></tr>
+            <tr><td>筛选选项文字</td><td>14px</td><td>Regular</td><td>#333333</td></tr>
+            <tr><td>错题日期</td><td>14px</td><td>Regular</td><td>#666666</td></tr>
+            <tr><td>按钮文字</td><td>16px</td><td>Medium</td><td>#FFFFFF</td></tr>
+            <tr><td>Toast文字</td><td>14px</td><td>Regular</td><td>#FFFFFF</td></tr>
+        </table>
+
+        <h3>7.3 间距规范</h3>
+        <table>
+            <tr><th>场景</th><th>间距</th></tr>
+            <tr><td>页面左右边距</td><td>16px</td></tr>
+            <tr><td>卡片内边距</td><td>12px</td></tr>
+            <tr><td>卡片间距</td><td>12px</td></tr>
+            <tr><td>筛选区域间距</td><td>24px</td></tr>
+            <tr><td>筛选项间距</td><td>8px</td></tr>
+        </table>
+
+        <h3>7.4 圆角规范</h3>
+        <table>
+            <tr><th>元素</th><th>圆角</th></tr>
+            <tr><td>卡片</td><td>12px</td></tr>
+            <tr><td>按钮</td><td>8px</td></tr>
+            <tr><td>复选框</td><td>圆形</td></tr>
+            <tr><td>筛选选项</td><td>8px</td></tr>
+            <tr><td>弹窗</td><td>16px</td></tr>
+        </table>
+
+        <div class="divider"></div>
+
+        <!-- Section 8 -->
+        <h2 id="section8">8. 数据埋点需求</h2>
+
+        <h3>8.1 核心埋点事件</h3>
+        <table>
+            <tr><th>埋点ID</th><th>事件名称</th><th>触发时机</th><th>上报参数</th></tr>
+            <tr><td>enter_exam_page</td><td>进入组成试卷页面</td><td>用户进入页面</td><td>source: 首页/底部Tab</td></tr>
+            <tr><td>click_filter</td><td>点击筛选按钮</td><td>用户点击筛选入口</td><td>current_filters: 当前筛选条件</td></tr>
+            <tr><td>select_subject</td><td>选择科目</td><td>用户选择科目选项</td><td>subject: 科目名称</td></tr>
+            <tr><td>select_grade</td><td>选择年级</td><td>用户选择年级选项</td><td>grade: 年级名称</td></tr>
+            <tr><td>select_time</td><td>选择时间</td><td>用户选择时间选项</td><td>time_range: 时间范围</td></tr>
+            <tr><td>select_source</td><td>选择来源</td><td>用户选择来源选项</td><td>source_type: 来源类型</td></tr>
+            <tr><td>select_mastery</td><td>选择掌握程度</td><td>用户选择掌握程度</td><td>mastery_level: 掌握程度</td></tr>
+            <tr><td>filter_result</td><td>筛选结果</td><td>筛选完成</td><td>result_count: 结果数量, filters: 筛选条件</td></tr>
+            <tr><td>enter_manage_mode</td><td>进入管理模式</td><td>用户点击"管理"按钮</td><td>question_count: 列表题目数量</td></tr>
+            <tr><td>select_question</td><td>选择题目</td><td>用户勾选/取消勾选题目</td><td>question_id: 题目ID, is_selected: true/false</td></tr>
+            <tr><td>select_all</td><td>全选/取消全选</td><td>用户点击全选按钮</td><td>is_select_all: true/false, selected_count: 选中数量</td></tr>
+            <tr><td>click_delete</td><td>点击删除按钮</td><td>用户点击删除</td><td>selected_count: 选中数量</td></tr>
+            <tr><td>confirm_delete</td><td>确认删除</td><td>用户点击确认删除</td><td>selected_count: 选中数量</td></tr>
+            <tr><td>cancel_delete</td><td>取消删除</td><td>用户点击取消</td><td>-</td></tr>
+            <tr><td>delete_success</td><td>删除成功</td><td>删除操作完成</td><td>deleted_count: 删除数量</td></tr>
+            <tr><td>click_generate_paper</td><td>点击选择组卷</td><td>用户点击组卷按钮</td><td>selected_count: 选中数量</td></tr>
+            <tr><td>paper_preview</td><td>试卷预览</td><td>进入预览页面</td><td>question_count: 题目数量, source_type: 原题/相似题</td></tr>
+            <tr><td>switch_paper_type</td><td>切换试卷类型</td><td>用户切换原题/相似题</td><td>paper_type: original/similar</td></tr>
+            <tr><td>click_export</td><td>点击导出组卷</td><td>用户点击导出按钮</td><td>paper_type: 试卷类型</td></tr>
+            <tr><td>export_with_answer</td><td>导出设置</td><td>用户设置导出选项</td><td>show_answer: true/false</td></tr>
+            <tr><td>export_success</td><td>导出成功</td><td>导出完成</td><td>file_size: 文件大小, question_count: 题目数量</td></tr>
+        </table>
+
+        <h3>8.2 埋点参数说明</h3>
+        <table>
+            <tr><th>参数名</th><th>类型</th><th>说明</th></tr>
+            <tr><td>source</td><td>String</td><td>来源渠道：home_page（首页）、bottom_tab（底部Tab）</td></tr>
+            <tr><td>current_filters</td><td>JSON</td><td>当前所有筛选条件</td></tr>
+            <tr><td>subject</td><td>String</td><td>科目名称</td></tr>
+            <tr><td>grade</td><td>String</td><td>年级名称</td></tr>
+            <tr><td>time_range</td><td>String</td><td>时间范围：today/week/month/all</td></tr>
+            <tr><td>source_type</td><td>String</td><td>来源类型：举一反三/unmarked</td></tr>
+            <tr><td>mastery_level</td><td>String</td><td>掌握程度：懂了/不懂</td></tr>
+            <tr><td>result_count</td><td>Number</td><td>筛选结果数量</td></tr>
+            <tr><td>question_id</td><td>String</td><td>题目唯一标识</td></tr>
+            <tr><td>is_selected</td><td>Boolean</td><td>是否选中</td></tr>
+            <tr><td>is_select_all</td><td>Boolean</td><td>是否全选</td></tr>
+            <tr><td>selected_count</td><td>Number</td><td>选中题目数量</td></tr>
+            <tr><td>deleted_count</td><td>Number</td><td>删除题目数量</td></tr>
+            <tr><td>paper_type</td><td>String</td><td>试卷类型：original（原题）/similar（相似题）</td></tr>
+            <tr><td>show_answer</td><td>Boolean</td><td>是否显示答案解析</td></tr>
+            <tr><td>file_size</td><td>Number</td><td>导出文件大小（KB）</td></tr>
+        </table>
+
+        <div class="divider"></div>
+
+        <!-- Section 9 -->
+        <h2 id="section9">9. 非功能需求</h2>
+
+        <h3>9.1 性能要求</h3>
+        <table>
+            <tr><th>场景</th><th>指标要求</th></tr>
+            <tr><td>筛选结果加载</td><td>≤ 500ms</td></tr>
+            <tr><td>试卷生成</td><td>≤ 3s（10道题以内）</td></tr>
+            <tr><td>PDF导出</td><td>≤ 5s（10道题以内）</td></tr>
+            <tr><td>页面切换</td><td>≤ 300ms</td></tr>
+            <tr><td>列表滚动</td><td>60fps，无卡顿</td></tr>
+        </table>
+
+        <h3>9.2 兼容性要求</h3>
+        <table>
+            <tr><th>平台</th><th>版本要求</th></tr>
+            <tr><td>iOS</td><td>12.0+</td></tr>
+            <tr><td>Android</td><td>6.0+</td></tr>
+            <tr><td>屏幕分辨率</td><td>720p ~ 2K</td></tr>
+        </table>
+
+        <h3>9.3 安全性要求</h3>
+        <ul>
+            <li>删除操作需要用户二次确认</li>
+            <li>导出文件需包含用户水印（可选）</li>
+            <li>用户数据加密存储</li>
+        </ul>
+
+        <h3>9.4 稳定性要求</h3>
+        <ul>
+            <li>功能崩溃率 ≤ 0.01%</li>
+            <li>导出失败率 ≤ 1%</li>
+            <li>数据丢失率 = 0%</li>
+        </ul>
+
+        <div class="divider"></div>
+
+        <!-- Section 10 -->
+        <h2 id="section10">10. 验收标准</h2>
+
+        <h3>10.1 功能验收</h3>
+
+        <h4>筛选功能</h4>
+        <ul class="checklist">
+            <li>首页点击"组成试卷"可正常进入页面</li>
+            <li>底部Tab点击可正常进入页面</li>
+            <li>筛选条件栏显示科目、年级、时间、筛选按钮</li>
+            <li>点击筛选按钮可进入筛选页面</li>
+            <li>筛选页面显示5个筛选维度：科目、来源、掌握程度、收集时间、年级</li>
+            <li>每个维度默认选中"全部"</li>
+            <li>选择筛选选项后，选项状态正确变化</li>
+            <li>返回列表后，筛选条件正确应用</li>
+            <li>筛选结果为空时，显示空状态提示</li>
+        </ul>
+
+        <h4>选择模式</h4>
+        <ul class="checklist">
+            <li>点击"管理"按钮进入选择模式</li>
+            <li>进入选择模式后，显示复选框和底部操作栏</li>
+            <li>点击复选框可勾选/取消勾选题目</li>
+            <li>点击"全选"可选中所有题目</li>
+            <li>点击"取消全选"可取消所有选中</li>
+            <li>未选中题目时，"删除"和"选择组卷"按钮置灰</li>
+            <li>选中题目后，按钮变为可点击状态</li>
+            <li>点击"取消"可退出选择模式</li>
+        </ul>
+
+        <h4>删除功能</h4>
+        <ul class="checklist">
+            <li>点击"删除"弹出确认弹窗</li>
+            <li>弹窗显示"错题删除后不可恢复，确认是否删除？"</li>
+            <li>点击"取消"关闭弹窗，返回选择模式</li>
+            <li>点击"确认删除"执行删除操作</li>
+            <li>删除成功后刷新列表</li>
+            <li>删除所有题目后显示空状态</li>
+        </ul>
+
+        <h4>组卷功能</h4>
+        <ul class="checklist">
+            <li>点击"选择组卷"生成试卷</li>
+            <li>生成过程中显示加载状态</li>
+            <li>预览页面显示试卷内容</li>
+            <li>支持切换"原题"和"相似题"</li>
+            <li>支持翻页操作</li>
+            <li>页码显示正确</li>
+        </ul>
+
+        <h4>导出功能</h4>
+        <ul class="checklist">
+            <li>点击"导出组卷"显示导出选项</li>
+            <li>可选择是否显示答案解析</li>
+            <li>确认导出后生成PDF</li>
+            <li>导出成功后显示成功提示</li>
+            <li>导出的PDF内容正确</li>
+        </ul>
+
+        <h3>10.2 性能验收</h3>
+        <ul class="checklist">
+            <li>筛选结果加载时间 ≤ 500ms</li>
+            <li>试卷生成时间 ≤ 3s</li>
+            <li>PDF导出时间 ≤ 5s</li>
+            <li>页面切换无卡顿</li>
+            <li>列表滚动流畅（60fps）</li>
+        </ul>
+
+        <h3>10.3 兼容性验收</h3>
+        <ul class="checklist">
+            <li>iOS 12.0+ 设备功能正常</li>
+            <li>Android 6.0+ 设备功能正常</li>
+            <li>不同分辨率屏幕显示正常</li>
+        </ul>
+
+        <div class="divider"></div>
+
+        <!-- Section 11 -->
+        <h2 id="section11">11. 风险评估与应对</h2>
+
+        <table>
+            <tr><th>风险</th><th>概率</th><th>影响</th><th>应对方案</th></tr>
+            <tr><td>试卷生成性能问题</td><td class="risk-medium">中</td><td>用户等待时间过长</td><td>优化生成算法，添加加载动画，设置超时提示</td></tr>
+            <tr><td>PDF导出失败</td><td class="risk-low">低</td><td>用户无法保存试卷</td><td>增加重试机制，提供替代导出格式（如图片）</td></tr>
+            <tr><td>筛选结果为空</td><td class="risk-high">高</td><td>用户体验差</td><td>显示空状态提示，引导用户调整筛选条件</td></tr>
+            <tr><td>相似题质量不高</td><td class="risk-medium">中</td><td>用户满意度下降</td><td>优化AI模型，提供原题作为备选</td></tr>
+            <tr><td>大量题目导出内存溢出</td><td class="risk-low">低</td><td>应用崩溃</td><td>分批处理，限制单次导出数量</td></tr>
+            <tr><td>用户误删题目</td><td class="risk-medium">中</td><td>数据丢失</td><td>二次确认机制，可考虑增加回收站功能</td></tr>
+        </table>
+
+        <div class="divider"></div>
+
+        <!-- Section 12 -->
+        <h2 id="section12">12. 上线计划</h2>
+
+        <h3>12.1 上线计划</h3>
+        <table>
+            <tr><th>阶段</th><th>时间</th><th>内容</th></tr>
+            <tr><td>开发阶段</td><td>（待填写）</td><td>前后端开发</td></tr>
+            <tr><td>测试阶段</td><td>（待填写）</td><td>功能测试、性能测试、兼容性测试</td></tr>
+            <tr><td>灰度阶段</td><td>（待填写）</td><td>灰度1% → 10% → 50%用户</td></tr>
+            <tr><td>全量上线</td><td>（待填写）</td><td>全量发布</td></tr>
+        </table>
+
+        <div class="footer">
+            <p>— 文档结束 —</p>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.toc a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
