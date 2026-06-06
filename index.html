@@ -6,14 +6,19 @@
   <title>蔡文杰 | UI/UX 设计作品集</title>
   <meta name="description" content="蔡文杰的个人作品集，展示UI/UX设计、网页设计、交互设计等项目作品。">
 
-  <!-- Tailwind CSS v3 CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Lucide 图标库 -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS v3 本地化 -->
+  <script src="vendor/tailwind.js"></script>
+  <!-- Lucide 图标库 本地化 -->
+  <script src="vendor/lucide.min.js"></script>
+  <!-- 字体：使用国内CDN替代Google Fonts -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css" rel="stylesheet">
+  <style>
+    /* 字体回退方案：优先使用系统字体，保证国内访问速度 */
+    :root {
+      --font-sans: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
+    }
+  </style>
 
   <!-- Tailwind 自定义配置 -->
   <script>
@@ -21,7 +26,7 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Inter', 'system-ui', 'sans-serif'],
+            sans: ['LXGW WenKai', 'PingFang SC', 'Microsoft YaHei', 'system-ui', 'sans-serif'],
           },
           colors: {
             dark: {
